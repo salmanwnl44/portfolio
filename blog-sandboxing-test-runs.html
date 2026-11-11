@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Running untrusted tests without handing over the machine — Salman Ansari</title>
+<meta name="description" content="The sandboxed test engine behind Yavin: what it blocks, and why time limits and cancellation were the hard part." />
+<meta name="theme-color" content="#0b0d0e" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Running untrusted tests without handing over the machine" />
+<meta property="og:description" content="The sandboxed test engine behind Yavin, built in Rust and Tauri." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611112343" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar" aria-label="Primary">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="./index.html" class="nav-link">Home</a></li>
+      <li><a href="./projects.html" class="nav-link">Projects</a></li>
+      <li><a href="./blog.html" class="nav-link is-active">Blog</a></li>
+      <li><a href="./resume.html" class="nav-link">Resume</a></li>
+      <li><a href="./analytics.html" class="nav-link">Analytics</a></li>
+      <li><a href="./support.html" class="nav-link">Support</a></li>
+    </ul>
+    <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
+      <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
+      <span>Open-source</span>
+    </a>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <article class="article">
+    <header class="article-head">
+      <a class="back-link" href="./blog.html">← all posts</a>
+      <h1 class="article-title">Running untrusted tests without handing over the machine</h1>
+      <p class="article-desc">An AI editor that can run your test suite needs a hard boundary around what that suite is allowed to touch. This is the sandbox I built for Yavin — what it blocks, and why time limits and cancellation turned out to be the hard part.</p>
+
+      <div class="author">
+        <img src="./assets/portrait.jpg" alt="Salman Ansari" width="36" height="36" />
+        <div>
+          <div class="author-name">Salman Ansari</div>
+          <div class="author-meta">Nov 2026 · 6 min read</div>
+        </div>
+      </div>
+    </header>
+
+    <h2>The problem with a test button</h2>
+    <p>Yavin is a code editor where the AI suggests changes and you review them side by side before anything is accepted. Early on I added a test panel: find your tests, run them, stop them, inspect the results, all without leaving the editor.</p>
+    <p>That button is more dangerous than it looks. A test file is just code, and code that runs on <span class="mark-strong">your</span> machine with <span class="mark-strong">your</span> permissions can do anything you can do. The moment an AI is proposing edits to that code, "just shell out and run it" stops being acceptable.</p>
+
+    <div class="alert alert-dont">
+      <span class="ico" aria-hidden="true">✕</span>
+      <div>Don't hand the test command straight to a shell. Whatever the suite does — read an SSH key, post to an endpoint, delete a directory one level up — happens silently and with your full privileges.</div>
+    </div>
+
+    <h2>Drawing the boundary</h2>
+    <p>The execution engine lives in Rust, behind Tauri, and everything the editor wants to run goes through it. It enforces two rules.</p>
+
+    <ul class="list">
+      <li><span class="mark">Unsafe commands are blocked.</span> The runner accepts a known set of test commands, not arbitrary shell input.</li>
+      <li><span class="mark">File access stays inside the project.</span> Paths are resolved and checked against the project root, so a suite can't reach a sibling directory or your home folder.</li>
+    </ul>
+
+    <p>The second rule needs care, because the obvious implementation is wrong. Checking whether a path <em>string</em> starts with the project root is defeated by <span class="mark">../</span> segments and by symlinks pointing outward. The check has to happen on the canonical path, after resolution:</p>
+
+    <div class="code">
+      <div class="code-head">
+        <span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>sandbox.rs</span>
+      </div>
+      <pre><span class="c">// Resolve first, compare second — a prefix check on the raw</span>
+<span class="c">// string is defeated by ../ and by symlinks.</span>
+<span class="k">fn</span> within_project(root: &amp;Path, candidate: &amp;Path) -&gt; <span class="k">bool</span> {
+    <span class="k">let</span> root = <span class="k">match</span> root.canonicalize() { Ok(p) =&gt; p, Err(_) =&gt; <span class="k">return</span> <span class="k">false</span> };
+    <span class="k">let</span> target = <span class="k">match</span> candidate.canonicalize() { Ok(p) =&gt; p, Err(_) =&gt; <span class="k">return</span> <span class="k">false</span> };
+    target.starts_with(&amp;root)
+}</pre>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="ico" aria-hidden="true">!</span>
+      <div>Canonicalising fails on paths that don't exist yet, so a suite writing a new fixture file looks like a violation. Resolve the parent directory instead, then join the final segment.</div>
+    </div>
+
+    <h2>The part I underestimated</h2>
+    <p>Blocking things was the easy half. Making runs <span class="mark-strong">dependable</span> took longer, and it's what the tests in the repo mostly cover.</p>
+
+    <p>Three failure modes matter, and none of them are exotic:</p>
+
+    <ul class="list">
+      <li><span class="mark">A suite that never finishes.</span> An await that never resolves, a test waiting on a port nobody opened. Without a time limit the panel hangs forever and the only way out is killing the editor.</li>
+      <li><span class="mark">A stop button that doesn't stop.</span> Killing the process you spawned isn't enough — test runners spawn children of their own, and those keep going, keep holding ports, keep writing output into a run that's supposedly over.</li>
+      <li><span class="mark">A runner that crashes mid-run.</span> The UI has to end up in a defined state, showing a failure, not a spinner that never resolves.</li>
+    </ul>
+
+    <p>So every run carries a deadline, cancellation tears down the whole process tree rather than one PID, and a crash is reported as a result like any other. The editor only ever sees one of three outcomes:</p>
+
+    <div class="code terminal">
+      <div class="code-head">
+        <span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>test panel</span>
+      </div>
+      <pre>$ run --suite unit
+  ✓ 58 passed            finished
+  ⏱ timed out after 30s  cancelled
+  ✕ runner crashed       reported</pre>
+    </div>
+
+    <div class="alert alert-tip">
+      <span class="ico" aria-hidden="true">✓</span>
+      <div>Write the cancellation tests before the happy-path ones. "Does it run the suite" passes almost immediately; "does stop actually stop everything" is the behaviour that quietly regresses.</div>
+    </div>
+
+    <h2>What I'd tell myself at the start</h2>
+    <p>The sandbox isn't the interesting part of an AI code editor, and that's exactly why it needs to be boring and well covered. The engine has <span class="mark-strong">58 automated tests</span> behind it, and the majority are about time limits, cancellation and crash handling rather than about running tests successfully.</p>
+    <p>A review screen that shows you every AI change is only trustworthy if accepting one can't quietly run something you didn't read.</p>
+
+    <footer class="article-foot">
+      <a class="btn" href="./blog.html">← All posts</a>
+      <a class="btn" href="https://github.com/salmanwnl44/Yavin-Rust-1" target="_blank" rel="noopener">Yavin on GitHub ↗</a>
+    </footer>
+  </article>
+</main>
+
+<footer class="footer">
+  <p class="footer-quote">"Ship it to someone who'll actually use it."</p>
+  <p class="footer-made">Designed &amp; Made with <span class="heart" aria-hidden="true">❤️</span></p>
+  <p class="footer-bottom">
+    <span><span data-year>2026</span>. All rights reserved</span>
+    <span data-clock-24>--:--:-- IST</span>
+  </p>
+</footer>
+
+<script src="./assets/main.js?v=202611112343" defer></script>
+</body>
+</html>
