@@ -97,8 +97,8 @@
   var calTotal = document.querySelector('[data-cal-total]');
 
   var CELL = 13;
-  var MIN_CELL = 8;
   var GAP = 3;
+  var lastRender = null;
   var MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   function renderCalendar(days, total, label) {
@@ -115,7 +115,19 @@
     for (i = 0; i < lead; i++) cells.push(null);
     cells = cells.concat(days);
 
+    // Draw only as many whole weeks as fit at the natural cell size, counting
+    // back from the most recent week. Nothing is squashed and nothing scrolls.
+    var scroller = calGrid.parentElement;
+    var available = (scroller ? scroller.clientWidth : 0) || 640;
+    var step = CELL + GAP;
+    var weeksThatFit = Math.max(8, Math.floor((available + GAP) / step));
+
     var weeks = Math.ceil(cells.length / 7);
+    if (weeks > weeksThatFit) {
+      cells = cells.slice((weeks - weeksThatFit) * 7);
+      weeks = weeksThatFit;
+    }
+
     var monthSpans = [];
 
     for (i = 0; i < cells.length; i++) {
@@ -141,17 +153,9 @@
       }
     }
 
-    // Size cells so the whole year fits the container — no horizontal scroll,
-    // and the most recent (busiest) weeks stay on screen.
-    var scroller = calGrid.parentElement;
-    var available = (scroller ? scroller.clientWidth : 0) || 640;
-    var cell = Math.floor((available - (weeks - 1) * GAP) / weeks);
-    cell = Math.max(MIN_CELL, Math.min(CELL, cell));
-    var step = cell + GAP;
-
-    calGrid.style.gridTemplateRows = 'repeat(7, ' + cell + 'px)';
+    calGrid.style.gridTemplateRows = 'repeat(7, ' + CELL + 'px)';
     calGrid.style.width = (weeks * step - GAP) + 'px';
-    calGrid.style.setProperty('--cal-cell', cell + 'px');
+    calGrid.style.setProperty('--cal-cell', CELL + 'px');
 
     if (calMonths) {
       calMonths.style.width = (weeks * step - GAP) + 'px';
@@ -164,16 +168,23 @@
       });
     }
 
-    // if it still overflows (narrow phones), show the most recent weeks first
-    if (scroller && scroller.scrollWidth > scroller.clientWidth) {
-      scroller.scrollLeft = scroller.scrollWidth;
-    }
+    lastRender = { days: days, total: total, label: label };
 
     if (calTotal) {
       calTotal.textContent =
         label || 'This year, I achieved ' + total.toLocaleString() + ' contributions';
     }
   }
+
+  // Re-trim when the container width changes.
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    if (!lastRender) return;
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(function () {
+      renderCalendar(lastRender.days, lastRender.total, lastRender.label);
+    }, 150);
+  });
 
   /* Build a day-by-day map for the last 53 weeks, zero-filled. */
   function emptyYear() {

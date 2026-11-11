@@ -347,10 +347,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .exp-body em { font-style: normal; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-tertiary); }
 
 /* ---------- contribution calendar ---------- */
-.cal-scroll { overflow-x: auto; overflow-y: hidden; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: #333 transparent; }
-.cal-scroll::-webkit-scrollbar { height: 6px; }
-.cal-scroll::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 999px; }
-.cal-scroll::-webkit-scrollbar-track { background: transparent; }
+.cal-scroll { overflow: hidden; }
 .cal-months { display: flex; gap: 0; margin-bottom: 7px; font-size: 0.85rem; font-weight: 500; color: #e6e6e6; }
 .cal-month { flex: none; }
 .cal-grid { --cal-cell: 13px; display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, var(--cal-cell)); gap: 3px; }
