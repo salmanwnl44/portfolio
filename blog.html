@@ -4,13 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Blog — Salman Ansari</title>
-<meta name="description" content="Notes on building AI tooling, computer vision and distributed systems — by Salman Ansari." />
+<meta name="description" content="Build notes from Yavin — an AI-agentic code editor. Multi-agent architecture, MCP, guardrails and the bugs along the way." />
 <meta name="theme-color" content="#0b0d0e" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="./assets/styles.css?v=202611120009" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611120020" />
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -36,28 +36,82 @@
   <div class="page-head">
     <a class="back-link" href="./index.html">← back home</a>
     <h1 class="page-title">Blog</h1>
-    <p class="page-sub">Notes from building things — AI tooling, computer vision, and the parts that turned out harder than expected.</p>
+    <p class="page-sub">Build notes from Yavin — an AI-agentic code editor. Architecture decisions, the infrastructure underneath the agents, and the bugs worth writing down. Newest first.</p>
   </div>
 
   <section class="section">
-    <h2 class="section-title">The Yavin series</h2>
-    <p class="page-sub" style="margin:-8px 0 16px">Three days of build notes from the launch, expanded from the original posts.</p>
+    <h2 class="section-title">All posts</h2>
 
-    <a class="post-card" href="./blog-introducing-yavin.html">
+    <a class="post-card" href="./blog-building-it-myself.html">
       <div class="post-meta">
-        <span>23 Jan 2026</span>
+        <span>29 Apr 2026</span>
         <span class="sep">·</span>
-        <span>8 min read</span>
+        <span>4 min read</span>
         <span class="sep">·</span>
-        <span>part 1</span>
+        <span>reflection</span>
       </div>
-      <h3 class="post-title">Introducing Yavin: an AI-agentic code editor</h3>
-      <p class="post-excerpt">Autocomplete was a great start. This is the long version of the launch announcement — what Yavin is, and why each of the four v1.4.0 foundations exists: a Rust indexer that is 50–60× faster, model orchestration, multi-language AST parsing, and the Active Context Engine.</p>
+      <h3 class="post-title">I rebuilt what already existed, and I'd do it again</h3>
+      <p class="post-excerpt">In November 2025 I started building my own IDE on top of Monaco. Months later I found an open-source project that already had most of it. Why that wasn't wasted work — and what changes from here.</p>
       <div class="post-tags">
-        <span class="post-tag">AI Agents</span>
-        <span class="post-tag">Rust</span>
-        <span class="post-tag">Developer Tools</span>
-        <span class="post-tag">Launch</span>
+        <span class="post-tag">Monaco</span>
+        <span class="post-tag">Architecture</span>
+        <span class="post-tag">Learning</span>
+      </div>
+      <span class="post-read">Read the post →</span>
+    </a>
+
+    <a class="post-card" href="./blog-multi-agent-backend.html">
+      <div class="post-meta">
+        <span>18 Apr 2026</span>
+        <span class="sep">·</span>
+        <span>9 min read</span>
+        <span class="sep">·</span>
+        <span>build log</span>
+      </div>
+      <h3 class="post-title">Building a multi-agent backend from scratch</h3>
+      <p class="post-excerpt">A three-tier agent hierarchy, five guardrail components, a six-point hook pipeline where any hook can veto a tool call, in-process MCP servers and a real-time debug panel. The hard part wasn't any one feature — it was composability without coupling.</p>
+      <div class="post-tags">
+        <span class="post-tag">Multi-agent</span>
+        <span class="post-tag">asyncio</span>
+        <span class="post-tag">Guardrails</span>
+        <span class="post-tag">MCP</span>
+      </div>
+      <span class="post-read">Read the post →</span>
+    </a>
+
+    <a class="post-card" href="./blog-multi-provider-mcp.html">
+      <div class="post-meta">
+        <span>12 Apr 2026</span>
+        <span class="sep">·</span>
+        <span>6 min read</span>
+        <span class="sep">·</span>
+        <span>build log</span>
+      </div>
+      <h3 class="post-title">Multi-provider agents, MCP, and showing the model think</h3>
+      <p class="post-excerpt">Groq and local Ollama models running as full agents, a complete MCP client and registry, a stream-safe parser that renders a model's reasoning as a collapsible block, and one file for every system prompt.</p>
+      <div class="post-tags">
+        <span class="post-tag">MCP</span>
+        <span class="post-tag">Groq</span>
+        <span class="post-tag">Ollama</span>
+        <span class="post-tag">LLM</span>
+      </div>
+      <span class="post-read">Read the post →</span>
+    </a>
+
+    <a class="post-card" href="./blog-ipc-closure-bug.html">
+      <div class="post-meta">
+        <span>11 Apr 2026</span>
+        <span class="sep">·</span>
+        <span>5 min read</span>
+        <span class="sep">·</span>
+        <span>build log</span>
+      </div>
+      <h3 class="post-title">The closure trap hiding in an IPC handler</h3>
+      <p class="post-excerpt">A day auditing the bridge between the Python daemon, the Electron main process and the React frontend — and the three-line scope bug that made every provider status come back null, silently.</p>
+      <div class="post-tags">
+        <span class="post-tag">Electron</span>
+        <span class="post-tag">IPC</span>
+        <span class="post-tag">Debugging</span>
       </div>
       <span class="post-read">Read the post →</span>
     </a>
@@ -68,7 +122,7 @@
         <span class="sep">·</span>
         <span>7 min read</span>
         <span class="sep">·</span>
-        <span>part 2</span>
+        <span>launch series</span>
       </div>
       <h3 class="post-title">The stack behind Yavin: intelligence as infrastructure</h3>
       <p class="post-excerpt">Building an AI editor that actually understands code is very different from building a simple AI wrapper. The four agent roles — planning, exploration, coding and validation — the three layers underneath them, and the plain scaffold it all grew out of.</p>
@@ -80,73 +134,24 @@
       <span class="post-read">Read the post →</span>
     </a>
 
-    <div class="post-card" style="cursor:default">
+    <a class="post-card" href="./blog-introducing-yavin.html">
       <div class="post-meta">
-        <span>25 Jan 2026</span>
+        <span>23 Jan 2026</span>
         <span class="sep">·</span>
-        <span>part 3</span>
+        <span>8 min read</span>
         <span class="sep">·</span>
-        <span class="post-draft">coming next</span>
+        <span>first post</span>
       </div>
-      <h3 class="post-title">Why AST-based understanding changes how AI interacts with code</h3>
-      <p class="post-excerpt">The difference between an editor that reads your files as text and one that reads them as structure — and what that buys an agent working across a large codebase.</p>
+      <h3 class="post-title">Introducing Yavin: an AI-agentic code editor</h3>
+      <p class="post-excerpt">Autocomplete was a great start. The long version of the launch announcement — what Yavin is, and why each of the four v1.4.0 foundations exists: a Rust indexer that is 50–60× faster, model orchestration, multi-language AST parsing, and the Active Context Engine.</p>
       <div class="post-tags">
-        <span class="post-tag">AST</span>
-        <span class="post-tag">Context</span>
-        <span class="post-tag">Retrieval</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">More posts</h2>
-
-    <a class="post-card" href="./blog-sandboxing-test-runs.html">
-      <div class="post-meta">
-        <span>Nov 2026</span>
-        <span class="sep">·</span>
-        <span>6 min read</span>
-      </div>
-      <h3 class="post-title">Running untrusted tests without handing over the machine</h3>
-      <p class="post-excerpt">An AI editor that can run your test suite needs a hard boundary around what that suite is allowed to touch. Here's the sandbox I built for Yavin in Rust and Tauri — what it blocks, and why time limits and cancellation turned out to be the hard part.</p>
-      <div class="post-tags">
+        <span class="post-tag">AI Agents</span>
         <span class="post-tag">Rust</span>
-        <span class="post-tag">Tauri</span>
-        <span class="post-tag">Testing</span>
-        <span class="post-tag">Security</span>
+        <span class="post-tag">Developer Tools</span>
+        <span class="post-tag">Launch</span>
       </div>
       <span class="post-read">Read the post →</span>
     </a>
-
-    <div class="post-card" style="cursor:default">
-      <div class="post-meta">
-        <span>Coming soon</span>
-        <span class="sep">·</span>
-        <span class="post-draft">draft</span>
-      </div>
-      <h3 class="post-title">Shipping a computer-vision system to people who didn't ask for one</h3>
-      <p class="post-excerpt">The attendance system worked in a notebook long before it worked in a corridor. What changed between those two points was mostly conversations with faculty, not code.</p>
-      <div class="post-tags">
-        <span class="post-tag">OpenCV</span>
-        <span class="post-tag">Python</span>
-        <span class="post-tag">Rollout</span>
-      </div>
-    </div>
-
-    <div class="post-card" style="cursor:default">
-      <div class="post-meta">
-        <span>Coming soon</span>
-        <span class="sep">·</span>
-        <span class="post-draft">draft</span>
-      </div>
-      <h3 class="post-title">Splitting a SQL database across ten nodes</h3>
-      <p class="post-excerpt">Notes on building Scarif: packaging each node for repeatable deployment, balancing traffic so no single node becomes the bottleneck, and alerting on failures before anyone notices.</p>
-      <div class="post-tags">
-        <span class="post-tag">Docker</span>
-        <span class="post-tag">GCP</span>
-        <span class="post-tag">SQL</span>
-      </div>
-    </div>
   </section>
 </main>
 
@@ -159,6 +164,6 @@
   </p>
 </footer>
 
-<script src="./assets/main.js?v=202611120009" defer></script>
+<script src="./assets/main.js?v=202611120020" defer></script>
 </body>
 </html>

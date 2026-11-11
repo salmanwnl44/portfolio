@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>I rebuilt what already existed, and I'd do it again — Salman Ansari</title>
+<meta name="description" content="I spent months turning Monaco into a full IDE, then found an open-source project that already had most of it. Why that wasn't wasted work — and what changes from here." />
+<meta name="author" content="Salman Ansari" />
+<meta name="theme-color" content="#0b0d0e" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="I rebuilt what already existed, and I'd do it again" />
+<meta property="og:description" content="On building an IDE from scratch to understand it, and knowing when to stop." />
+<meta property="og:image" content="./assets/blog/yavin-welcome.jpg" />
+<meta property="article:published_time" content="2026-04-29T11:24:31Z" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611120020" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "I rebuilt what already existed, and I'd do it again",
+  "datePublished": "2026-04-29T11:24:31Z",
+  "author": { "@type": "Person", "name": "Salman Ansari", "url": "https://github.com/salmanwnl44" },
+  "image": "./assets/blog/yavin-welcome.jpg"
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar" aria-label="Primary">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="./index.html" class="nav-link">Home</a></li>
+      <li><a href="./projects.html" class="nav-link">Projects</a></li>
+      <li><a href="./blog.html" class="nav-link is-active">Blog</a></li>
+      <li><a href="./resume.html" class="nav-link">Resume</a></li>
+      <li><a href="./analytics.html" class="nav-link">Analytics</a></li>
+      <li><a href="./support.html" class="nav-link">Support</a></li>
+    </ul>
+    <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
+      <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
+      <span>Open-source</span>
+    </a>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <article class="article">
+    <header class="article-head">
+      <a class="back-link" href="./blog.html">← all posts</a>
+      <div class="post-meta" style="margin-bottom:10px"><span>Reflection</span></div>
+      <h1 class="article-title">I rebuilt what already existed, and I'd do it again</h1>
+      <p class="article-desc">In November 2025 I started building my own IDE. Months later I found an open-source project that already had most of it. Here's why that wasn't wasted work — and what I'm changing from here.</p>
+      <div class="author">
+        <img src="./assets/portrait.jpg" alt="Salman Ansari" width="36" height="36" />
+        <div>
+          <div class="author-name">Salman Ansari</div>
+          <div class="author-meta"><time datetime="2026-04-29">29 April 2026</time> · 4 min read</div>
+        </div>
+      </div>
+    </header>
+
+    <figure class="figure">
+      <img src="./assets/blog/yavin-welcome.jpg" alt="The Yavin start screen with the Cognitive Code Editor subtitle and entry points for opening a folder, creating a file, quick open and asking Yavin AI." width="800" height="411" loading="lazy" />
+      <figcaption>Yavin — started as a Monaco editor in a window, grew into a development tool.</figcaption>
+    </figure>
+
+    <p>In <span class="mark-strong">November 2025</span> I started building my own IDE, called Yavin. I used the Monaco Editor as the base and slowly turned it into a complete development tool, adding things one by one:</p>
+    <ul class="list">
+      <li>Git integration</li>
+      <li>A terminal</li>
+      <li>A file manager</li>
+      <li>And the other core features that make coding easier without switching between apps</li>
+    </ul>
+    <p>At that time the goal was simple: <span class="mark">understand how everything works by building it myself</span>.</p>
+
+    <h2>Then I found the thing that already did it</h2>
+    <p>Yesterday I came across an open-source project that already has most of these features built in.</p>
+    <p>The first feeling was the obvious one — that I'd done extra work for nothing. That feeling lasted about as long as it took to look at the code.</p>
+
+    <div class="alert alert-tip">
+      <span class="ico" aria-hidden="true">✓</span>
+      <div>Building it myself helped me understand the system much better. I now know how these pieces actually connect and work behind the scenes — which is a different kind of knowledge from knowing that a library exists.</div>
+    </div>
+
+    <p>Reading someone else's editor architecture is a completely different experience when you've already fought the same problems. The file watcher, the terminal multiplexing, the way a diff view has to reconcile with an open buffer — I don't have to take those designs on faith. I know why they're shaped that way, because I got them wrong first.</p>
+
+    <h2>What changes from here</h2>
+    <p>Going forward I want to focus on:</p>
+    <ul class="list">
+      <li><span class="mark-strong">Improving the architecture</span> rather than widening the feature list.</li>
+      <li><span class="mark-strong">Making it faster</span> — the work that actually differentiates the tool.</li>
+      <li><span class="mark-strong">Using open-source tools where it makes sense</span>, instead of rebuilding everything.</li>
+    </ul>
+    <p>That last line is the real shift. Rebuilding everything was the right call when the goal was learning. It's the wrong call now that the goal is a tool people use — and the agent layer, not the editor chrome, is where Yavin is actually worth building.</p>
+
+    <p>Still working on Yavin, and learning a lot through the process.</p>
+
+    <h2>Resources</h2>
+    <ul class="list">
+      <li><a class="link" href="https://www.linkedin.com/posts/salmanwnl_in-november-2025-i-started-building-my-own-share-7455215437522526208-ckku/" target="_blank" rel="noopener">The original post on LinkedIn</a> — 29 April 2026.</li>
+      <li><a class="link" href="./blog-multi-agent-backend.html">Building a multi-agent backend from scratch</a> — the layer that stays.</li>
+      <li><a class="link" href="./blog-introducing-yavin.html">Introducing Yavin</a> — where the project was announced.</li>
+      <li><a class="link" href="https://microsoft.github.io/monaco-editor/" target="_blank" rel="noopener">Monaco Editor</a> — the base it all started from.</li>
+    </ul>
+
+    <footer class="article-foot">
+      <a class="btn" href="./blog.html">← All posts</a>
+      <a class="btn" href="https://www.linkedin.com/posts/salmanwnl_in-november-2025-i-started-building-my-own-share-7455215437522526208-ckku/" target="_blank" rel="noopener">Original post ↗</a>
+    </footer>
+  </article>
+</main>
+
+<footer class="footer">
+  <p class="footer-quote">"Ship it to someone who'll actually use it."</p>
+  <p class="footer-made">Designed &amp; Made with <span class="heart" aria-hidden="true">❤️</span></p>
+  <p class="footer-bottom">
+    <span><span data-year>2026</span>. All rights reserved</span>
+    <span data-clock-24>--:--:-- IST</span>
+  </p>
+</footer>
+
+<script src="./assets/main.js?v=202611120020" defer></script>
+</body>
+</html>

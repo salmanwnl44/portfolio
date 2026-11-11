@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Building a multi-agent backend from scratch — Salman Ansari</title>
+<meta name="description" content="Two days of deep work on Yavin: a three-tier agent hierarchy, a guardrails layer with file locks and capability tiers, a six-point hook pipeline, in-process MCP servers and a real-time debug panel." />
+<meta name="author" content="Salman Ansari" />
+<meta name="theme-color" content="#0b0d0e" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Building a multi-agent backend from scratch" />
+<meta property="og:description" content="Agent hierarchy, guardrails, hooks and infrastructure — and the real difficulty: composability without coupling." />
+<meta property="og:image" content="./assets/blog/yavin-agent-steps.jpg" />
+<meta property="article:published_time" content="2026-04-18T13:13:19Z" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611120020" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Building a multi-agent backend from scratch",
+  "datePublished": "2026-04-18T13:13:19Z",
+  "author": { "@type": "Person", "name": "Salman Ansari", "url": "https://github.com/salmanwnl44" },
+  "image": "./assets/blog/yavin-agent-steps.jpg"
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar" aria-label="Primary">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="./index.html" class="nav-link">Home</a></li>
+      <li><a href="./projects.html" class="nav-link">Projects</a></li>
+      <li><a href="./blog.html" class="nav-link is-active">Blog</a></li>
+      <li><a href="./resume.html" class="nav-link">Resume</a></li>
+      <li><a href="./analytics.html" class="nav-link">Analytics</a></li>
+      <li><a href="./support.html" class="nav-link">Support</a></li>
+    </ul>
+    <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
+      <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
+      <span>Open-source</span>
+    </a>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <article class="article">
+    <header class="article-head">
+      <a class="back-link" href="./blog.html">← all posts</a>
+      <div class="post-meta" style="margin-bottom:10px"><span>Build log</span><span class="sep">·</span><span>two sessions</span></div>
+      <h1 class="article-title">Building a multi-agent backend from scratch</h1>
+      <p class="article-desc">Two sessions designing and implementing the core infrastructure for Yavin's agent system — hierarchy, guardrails, hooks, persistence and a debug panel to watch it all run.</p>
+      <div class="author">
+        <img src="./assets/portrait.jpg" alt="Salman Ansari" width="36" height="36" />
+        <div>
+          <div class="author-name">Salman Ansari</div>
+          <div class="author-meta"><time datetime="2026-04-18">18 April 2026</time> · 9 min read</div>
+        </div>
+      </div>
+    </header>
+
+    <figure class="figure">
+      <img src="./assets/blog/yavin-agent-steps.jpg" alt="The Yavin agent panel mid-run, showing sequential tool calls with per-call timings and a pending write awaiting approval." width="800" height="507" loading="lazy" />
+      <figcaption>The agent loop in the UI — every tool call named, timed and accountable.</figcaption>
+    </figure>
+
+    <p>This is the production-grade layer underneath the agents: what they're allowed to do, what stops them, and what happens when two of them want the same file.</p>
+
+    <h2>Agent architecture</h2>
+    <ul class="list">
+      <li>A <span class="mark-strong">3-tier hierarchy</span>: a Planner (T1) delegating to specialist agents (T2) — Coding, Debug, Refactor, Memory and Git.</li>
+      <li>Agents use <span class="mark">intelligent search/replace diffs</span> instead of full-file rewrites. The LLM outputs <span class="mark">{"edits": [...]}</span> JSON with exact string patches, applied atomically.</li>
+      <li>The <span class="mark">workspace file tree is injected into every agent's system prompt</span>, so agents never create duplicate files for something that already exists.</li>
+    </ul>
+
+    <div class="alert alert-tip">
+      <span class="ico" aria-hidden="true">✓</span>
+      <div>Search/replace patches beat full-file rewrites on every axis that matters: fewer tokens, a reviewable diff, no silent truncation of the parts the model didn't think about, and atomic application.</div>
+    </div>
+
+    <h2>The guardrails layer</h2>
+    <p>Five components, each answering a specific way autonomous agents go wrong:</p>
+
+    <div class="pillar">
+      <h3><span class="num">01</span> AgentLockSystem</h3>
+      <p>A file-level mutex preventing concurrent writes to the same path. Two agents working in parallel is a feature; two agents writing the same file is data loss.</p>
+    </div>
+    <div class="pillar">
+      <h3><span class="num">02</span> TimeoutManager</h3>
+      <p>Auto-releases all locks on timeout and publishes events. A stuck agent must not be able to hold a file hostage forever.</p>
+    </div>
+    <div class="pillar">
+      <h3><span class="num">03</span> RetryExecutor</h3>
+      <p>Exponential backoff, emitting <span class="mark">RETRY_TRIGGERED</span> and <span class="mark">RETRY_EXHAUSTED</span> events so retries are observable rather than invisible.</p>
+    </div>
+    <div class="pillar">
+      <h3><span class="num">04</span> PermissionGuard</h3>
+      <p>Blocks dangerous shell patterns and path traversal attacks before they execute.</p>
+    </div>
+    <div class="pillar">
+      <h3><span class="num">05</span> CapabilityTier</h3>
+      <p><span class="mark">READ_ONLY</span> / <span class="mark">WRITE</span> / <span class="mark">PROACTIVE</span> per-agent tool allowlists, with hard-blocked tools. A Debug agent doesn't need write access to earn its keep.</p>
+    </div>
+
+    <h2>The hook pipeline</h2>
+    <p>Six hook points wrap the entire lifecycle: <span class="mark">BEFORE_TOOL_CALL</span>, <span class="mark">AFTER_TOOL_CALL</span>, <span class="mark">TOOL_RESULT_PERSIST</span>, <span class="mark">BEFORE_LLM_CALL</span>, <span class="mark">AFTER_LLM_CALL</span> and <span class="mark">AGENT_END</span>.</p>
+    <p>Critically, <span class="mark-strong">any hook can veto a tool call before it hits disk</span>. That single property is what makes the whole thing governable — policy lives in one place instead of being re-implemented inside every agent.</p>
+    <p>The same pipeline routes IDE events: file save → lint + test, error → debug agent, git commit → memory agent.</p>
+
+    <h2>Infrastructure</h2>
+    <ul class="list">
+      <li><span class="mark-strong">RunQueue</span> — a per-session <span class="mark">asyncio.Lock</span> plus a global <span class="mark">Semaphore(10)</span> to serialise agent runs and prevent a thundering herd.</li>
+      <li><span class="mark-strong">SessionStore</span> — <span class="mark">aiosqlite</span>-backed persistence for sessions, messages and runs, with indexed queries.</li>
+      <li><span class="mark-strong">ContextEngine</span> — a token-budget-aware sliding window with a compaction strategy, so long sessions degrade gracefully instead of falling off a cliff.</li>
+      <li><span class="mark-strong">StandingOrders</span> — parses <span class="mark">AGENTS.md</span> at the workspace root into autonomous / requires-approval / forbidden rules.</li>
+    </ul>
+
+    <p>That last one is my favourite piece of the design: the rules for what agents may do unattended live in the repository, in version control, reviewable like any other file.</p>
+
+    <h2>In-process MCP servers</h2>
+    <p>File, Terminal, Git, Memory and Search all run <span class="mark">in-process</span> — no subprocess overhead. Every write operation follows the same path:</p>
+
+    <div class="code">
+      <div class="code-head">
+        <span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>write path</span>
+      </div>
+      <pre>permission check → lock acquire → execute → lock release → hook pipeline</pre>
+    </div>
+
+    <p>One path, every time. No tool gets its own special case, which is exactly why the guardrails can be trusted.</p>
+
+    <h2>Watching it run</h2>
+    <ul class="list">
+      <li>A <span class="mark-strong">real-time debug panel</span> over WebSocket: agent status, a live file lock map, a log feed (info / warning / error / decision) and an event trace.</li>
+      <li><span class="mark">Ctrl+Shift+D</span> toggles it — it connects only when open and stops reconnecting when closed.</li>
+      <li><span class="mark-strong">File context in chat</span>: type <span class="mark">@</span> for a fuzzy file picker across the workspace; tagged files are injected as context blocks into every agent call, with chips showing what's attached and letting you remove them before sending.</li>
+    </ul>
+
+    <h2>The actual hard part</h2>
+    <p>No single feature here was the difficulty. It was making the pieces <span class="mark-strong">composable without coupling</span>:</p>
+    <ul class="list">
+      <li>agents talk to MCP,</li>
+      <li>MCP owns the locks,</li>
+      <li>hooks intercept everything,</li>
+      <li>and the LLM never sees raw file paths it has to guess at.</li>
+    </ul>
+    <p>Each layer knows its own job and nothing about the others' internals. Get that wrong and every new agent means touching five files.</p>
+
+    <div class="alert alert-warn">
+      <span class="ico" aria-hidden="true">!</span>
+      <div>Open issue: a problem in how text is gathered for prompts, which leaves room for prompt injection. Next session's job — and worth stating plainly rather than quietly fixing, because it's the failure mode every tool-using agent shares.</div>
+    </div>
+
+    <h2>Tech</h2>
+    <p>Python asyncio, FastAPI, aiosqlite, React, Electron, and the Anthropic / Gemini / Groq / OpenAI APIs.</p>
+
+    <h2>Resources</h2>
+    <ul class="list">
+      <li><a class="link" href="https://www.linkedin.com/posts/salmanwnl_buildinginpublic-aiengineering-multiagent-share-7451256550259703808-r6ku/" target="_blank" rel="noopener">The original post on LinkedIn</a> — 18 April 2026.</li>
+      <li><a class="link" href="./blog-multi-provider-mcp.html">Multi-provider agents, MCP, and showing the model think</a> — the tool layer this builds on.</li>
+      <li><a class="link" href="./blog-yavin-stack.html">The stack behind Yavin</a> — the four agent roles in outline.</li>
+    </ul>
+
+    <div class="tag-row">
+      <span class="post-tag">#BuildingInPublic</span>
+      <span class="post-tag">#AIEngineering</span>
+      <span class="post-tag">#MultiAgent</span>
+    </div>
+
+    <footer class="article-foot">
+      <a class="btn" href="./blog.html">← All posts</a>
+      <a class="btn" href="https://www.linkedin.com/posts/salmanwnl_buildinginpublic-aiengineering-multiagent-share-7451256550259703808-r6ku/" target="_blank" rel="noopener">Original post ↗</a>
+    </footer>
+  </article>
+</main>
+
+<footer class="footer">
+  <p class="footer-quote">"Ship it to someone who'll actually use it."</p>
+  <p class="footer-made">Designed &amp; Made with <span class="heart" aria-hidden="true">❤️</span></p>
+  <p class="footer-bottom">
+    <span><span data-year>2026</span>. All rights reserved</span>
+    <span data-clock-24>--:--:-- IST</span>
+  </p>
+</footer>
+
+<script src="./assets/main.js?v=202611120020" defer></script>
+</body>
+</html>

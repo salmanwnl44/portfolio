@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The closure trap hiding in an IPC handler — Salman Ansari</title>
+<meta name="description" content="A day auditing the bridge between Yavin's Python daemon, the Electron main process and the React frontend — and the JavaScript scope bug that silently returned null." />
+<meta name="author" content="Salman Ansari" />
+<meta name="theme-color" content="#0b0d0e" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="The closure trap hiding in an IPC handler" />
+<meta property="og:description" content="Auditing the Python daemon to Electron to React pipeline on Yavin." />
+<meta property="og:image" content="./assets/blog/yavin-welcome.jpg" />
+<meta property="article:published_time" content="2026-04-11T16:54:39Z" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611120020" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The closure trap hiding in an IPC handler",
+  "datePublished": "2026-04-11T16:54:39Z",
+  "author": { "@type": "Person", "name": "Salman Ansari", "url": "https://github.com/salmanwnl44" },
+  "image": "./assets/blog/yavin-welcome.jpg"
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar" aria-label="Primary">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="./index.html" class="nav-link">Home</a></li>
+      <li><a href="./projects.html" class="nav-link">Projects</a></li>
+      <li><a href="./blog.html" class="nav-link is-active">Blog</a></li>
+      <li><a href="./resume.html" class="nav-link">Resume</a></li>
+      <li><a href="./analytics.html" class="nav-link">Analytics</a></li>
+      <li><a href="./support.html" class="nav-link">Support</a></li>
+    </ul>
+    <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
+      <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
+      <span>Open-source</span>
+    </a>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <article class="article">
+    <header class="article-head">
+      <a class="back-link" href="./blog.html">← all posts</a>
+      <div class="post-meta" style="margin-bottom:10px"><span>Build log</span><span class="sep">·</span><span>Yavin v1.2.0</span></div>
+      <h1 class="article-title">The closure trap hiding in an IPC handler</h1>
+      <p class="article-desc">Building an agentic AI IDE from the ground up is no joke. A full day auditing the bridge between the Python daemon, the Electron main process and the React frontend — and the three-line scope bug underneath it all.</p>
+      <div class="author">
+        <img src="./assets/portrait.jpg" alt="Salman Ansari" width="36" height="36" />
+        <div>
+          <div class="author-name">Salman Ansari</div>
+          <div class="author-meta"><time datetime="2026-04-11">11 April 2026</time> · 5 min read</div>
+        </div>
+      </div>
+    </header>
+
+    <figure class="figure">
+      <img src="./assets/blog/yavin-welcome.jpg" alt="The Yavin start screen: a dark editor window with the Yavin wordmark, the subtitle Cognitive Code Editor, and shortcuts for Open Folder, New File, Quick Open and Ask Yavin AI." width="800" height="411" loading="lazy" />
+      <figcaption>Yavin's start screen — Open Folder, New File, Quick Open, Ask Yavin AI.</figcaption>
+    </figure>
+
+    <p>Today was about auditing and bridging the gap between three processes that have to agree with each other: the <span class="mark">Python daemon</span> that runs the agents, the <span class="mark">Electron main process</span> that brokers everything, and the <span class="mark">React frontend</span> the human actually looks at — phases 4, 5 and 6 of the agent system.</p>
+
+    <h2>The symptom</h2>
+    <p>The frontend wasn't updating provider connectivity statuses. No crash, no error in the console. The UI simply showed nothing, as if no provider existed.</p>
+
+    <div class="alert alert-warn">
+      <span class="ico" aria-hidden="true">!</span>
+      <div>The worst bugs in multi-process apps don't throw. One side sends, the other side listens, and something in the middle quietly hands back <span class="mark">null</span>.</div>
+    </div>
+
+    <h2>The cause: a classic JavaScript closure trap</h2>
+    <p>Deep in <span class="mark">main.cjs</span>, the <span class="mark">settings:get-provider-status</span> IPC handler was trying to close over a <span class="mark">lastProviderStatus</span> variable. That variable was declared with <span class="mark">let</span> <em>inside a completely different setup function</em>.</p>
+    <p>Because it wasn't in the enclosing scope, the handler captured <span class="mark-strong">undefined</span> and returned null — forever, silently.</p>
+
+    <div class="code">
+      <div class="code-head">
+        <span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>main.cjs — the shape of the bug</span>
+      </div>
+      <pre><span class="c">// before — each setup function has its own private copy</span>
+<span class="k">function</span> setupDaemonHandlers() {
+  <span class="k">let</span> lastProviderStatus = <span class="k">null</span>;   <span class="c">// written here…</span>
+}
+
+<span class="k">function</span> setupStorageHandlers() {
+  ipcMain.handle(<span class="s">'settings:get-provider-status'</span>, () =&gt; {
+    <span class="k">return</span> lastProviderStatus;      <span class="c">// …never visible here</span>
+  });
+}</pre>
+    </div>
+
+    <p>The fix was to <span class="mark">hoist lastProviderStatus to the module level</span>, so the daemon handlers and the secure-storage handlers share one state cache. Instant fix.</p>
+
+    <div class="alert alert-tip">
+      <span class="ico" aria-hidden="true">✓</span>
+      <div>When state is read by more than one setup function, it belongs to the module, not to whichever function happened to write it first. A handler registered in one scope cannot see a <span class="mark">let</span> declared in another.</div>
+    </div>
+
+    <h2>Verifying the whole pipeline</h2>
+    <p>With the cache shared, I walked the full event path end to end rather than just confirming the one handler worked:</p>
+    <ul class="list">
+      <li>The Python <span class="mark">AgentExecutor</span> emits step-by-step events as it works.</li>
+      <li>It streams <span class="mark">stdout</span> from shell commands as they run, instead of buffering until the end.</li>
+      <li>Those events travel through the Electron relay into the React <span class="mark">StepFeed</span> component.</li>
+    </ul>
+    <p>That path is what makes an agent legible. If the feed lies, the human can't supervise anything.</p>
+
+    <h2>Security, confirmed not assumed</h2>
+    <ul class="list">
+      <li><span class="mark-strong">API keys</span> are encrypted through the OS keychain — DPAPI on Windows — not left sitting in app storage.</li>
+      <li><span class="mark-strong">Shell access</span> for the agent is gated behind a strict allowlist, so the agent can run things without being able to run <em>anything</em>.</li>
+    </ul>
+
+    <h2>Where the agent system stands</h2>
+    <p>Out of a 21-point agent system checklist, <span class="mark-strong">19 tasks are fully implemented and verified</span>. The agent can now:</p>
+    <ul class="list">
+      <li>securely read files,</li>
+      <li>execute isolated shell commands,</li>
+      <li>and queue code changes into a <span class="mark">Monaco DiffEditor</span> for user approval before anything is written to disk.</li>
+    </ul>
+    <p>That last point is the one I care most about. The agent proposes; the diff is the gate; the human decides.</p>
+
+    <p>Next up: pushing the limits of the multi-turn conversation loop.</p>
+
+    <h2>Resources</h2>
+    <ul class="list">
+      <li><a class="link" href="https://www.linkedin.com/posts/salmanwnl_buildinpublic-softwareengineering-artificialintelligence-share-7448775536912531457-OeUX/" target="_blank" rel="noopener">The original post on LinkedIn</a> — 11 April 2026.</li>
+      <li><a class="link" href="./blog-yavin-stack.html">The stack behind Yavin</a> — how these processes fit together.</li>
+      <li><a class="link" href="https://github.com/salmanwnl44/Yavin-v1.2.0" target="_blank" rel="noopener">Yavin v1.2.0 on GitHub</a>.</li>
+    </ul>
+
+    <div class="tag-row">
+      <span class="post-tag">#BuildInPublic</span>
+      <span class="post-tag">#SoftwareEngineering</span>
+      <span class="post-tag">#ArtificialIntelligence</span>
+      <span class="post-tag">#ElectronJS</span>
+      <span class="post-tag">#Python</span>
+      <span class="post-tag">#ReactJS</span>
+      <span class="post-tag">#Yavin</span>
+    </div>
+
+    <footer class="article-foot">
+      <a class="btn" href="./blog.html">← All posts</a>
+      <a class="btn" href="https://www.linkedin.com/posts/salmanwnl_buildinpublic-softwareengineering-artificialintelligence-share-7448775536912531457-OeUX/" target="_blank" rel="noopener">Original post ↗</a>
+    </footer>
+  </article>
+</main>
+
+<footer class="footer">
+  <p class="footer-quote">"Ship it to someone who'll actually use it."</p>
+  <p class="footer-made">Designed &amp; Made with <span class="heart" aria-hidden="true">❤️</span></p>
+  <p class="footer-bottom">
+    <span><span data-year>2026</span>. All rights reserved</span>
+    <span data-clock-24>--:--:-- IST</span>
+  </p>
+</footer>
+
+<script src="./assets/main.js?v=202611120020" defer></script>
+</body>
+</html>
