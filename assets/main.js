@@ -101,6 +101,69 @@
   var lastRender = null;
   var MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+  function prettyDate(iso) {
+    var d = new Date(iso + 'T00:00:00');
+    return MONTH_NAMES[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  }
+
+  /* Tooltip on contribution cells, with a blood-flame sweep left to right. */
+  var calTip = null;
+
+  function ensureTip() {
+    if (calTip) return calTip;
+    calTip = document.createElement('div');
+    calTip.className = 'cal-tip';
+    calTip.setAttribute('role', 'tooltip');
+    calTip.appendChild(document.createElement('span'));
+    document.body.appendChild(calTip);
+    return calTip;
+  }
+
+  function showTip(cell) {
+    var text = cell.getAttribute('data-tip');
+    if (!text) return;
+
+    var tip = ensureTip();
+    tip.firstChild.textContent = text;
+
+    // restart the flame sweep on every hover
+    tip.classList.remove('is-on');
+    void tip.offsetWidth;
+
+    var box = cell.getBoundingClientRect();
+    tip.style.left = (box.left + box.width / 2) + 'px';
+    tip.style.top = (box.top - tip.offsetHeight) + 'px';
+    tip.classList.add('is-on');
+
+    cell.classList.add('is-hot');
+
+    if (calGrid) {
+      calGrid.classList.remove('is-sweeping');
+      void calGrid.offsetWidth;
+      calGrid.classList.add('is-sweeping');
+    }
+  }
+
+  function hideTip(cell) {
+    if (calTip) calTip.classList.remove('is-on');
+    if (cell) cell.classList.remove('is-hot');
+  }
+
+  function bindTips(grid) {
+    grid.addEventListener('mouseover', function (e) {
+      var cell = e.target.closest ? e.target.closest('.cal-day[data-tip]') : null;
+      if (cell) showTip(cell);
+    });
+    grid.addEventListener('mouseout', function (e) {
+      var cell = e.target.closest ? e.target.closest('.cal-day[data-tip]') : null;
+      if (cell) hideTip(cell);
+    });
+    grid.addEventListener('mouseleave', function () {
+      hideTip(grid.querySelector('.cal-day.is-hot'));
+      grid.classList.remove('is-sweeping');
+    });
+  }
+
   function renderCalendar(days, total, label) {
     if (!calGrid) return;
     calGrid.style.display = 'grid';
@@ -138,7 +201,8 @@
         cell.setAttribute('data-empty', '');
       } else {
         cell.setAttribute('data-level', String(day.level || 0));
-        cell.title = day.count + (day.count === 1 ? ' contribution' : ' contributions') + ' on ' + day.date;
+        cell.setAttribute('data-tip',
+          day.count + (day.count === 1 ? ' contribution' : ' contributions') + ' on ' + prettyDate(day.date));
       }
       calGrid.appendChild(cell);
 
@@ -166,6 +230,11 @@
         el.textContent = MONTH_NAMES[span.month];
         calMonths.appendChild(el);
       });
+    }
+
+    if (!calGrid.hasAttribute('data-tips-bound')) {
+      calGrid.setAttribute('data-tips-bound', '');
+      bindTips(calGrid);
     }
 
     lastRender = { days: days, total: total, label: label };
