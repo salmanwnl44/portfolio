@@ -431,9 +431,19 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .pdf-frame { width: 100%; height: 78vh; min-height: 460px; border: 1px solid var(--border-default); border-radius: var(--radius-lg); background: var(--bg-skeleton); }
 
 .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
-.bar-name { width: 108px; flex: none; font-size: 0.82rem; color: var(--text-secondary); }
-.bar-track { flex: 1; height: 8px; border-radius: var(--radius-pill); background: var(--bg-surface); overflow: hidden; }
-.bar-fill { height: 100%; border-radius: var(--radius-pill); background: var(--text-faintest); }
+.bar-name {
+  width: 124px; flex: none; font-size: 0.82rem; color: var(--text-secondary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bar-track {
+  flex: 1; display: block; height: 8px; border-radius: var(--radius-pill);
+  background: var(--bg-surface); overflow: hidden;
+}
+/* must be block: width/height are ignored on an inline span */
+.bar-fill {
+  display: block; height: 100%; min-width: 3px; border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--cal-2), var(--cal-4));
+}
 .bar-val { width: 46px; flex: none; text-align: right; font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-dim); }
 
 /* ---------- reveal ---------- */
