@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The stack behind Yavin: intelligence as infrastructure — Salman Ansari</title>
+<meta name="description" content="Building an AI editor that understands code is not building an AI wrapper. The multi-agent architecture behind Yavin — planning, exploration, coding and validation — and the stack underneath it." />
+<meta name="author" content="Salman Ansari" />
+<meta name="theme-color" content="#0b0d0e" />
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="The stack behind Yavin: intelligence as infrastructure" />
+<meta property="og:description" content="A multi-agent system where planning, exploration, coding and validation reason over the entire codebase." />
+<meta property="og:image" content="./assets/blog/yavin-stack-2.jpg" />
+<meta property="article:published_time" content="2026-01-24T16:33:25Z" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611120009" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The stack behind Yavin: intelligence as infrastructure",
+  "datePublished": "2026-01-24T16:33:25Z",
+  "author": { "@type": "Person", "name": "Salman Ansari", "url": "https://github.com/salmanwnl44" },
+  "image": "./assets/blog/yavin-stack-2.jpg",
+  "keywords": "Yavin, multi-agent, AI, devtools, software engineering, architecture"
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar" aria-label="Primary">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="./index.html" class="nav-link">Home</a></li>
+      <li><a href="./projects.html" class="nav-link">Projects</a></li>
+      <li><a href="./blog.html" class="nav-link is-active">Blog</a></li>
+      <li><a href="./resume.html" class="nav-link">Resume</a></li>
+      <li><a href="./analytics.html" class="nav-link">Analytics</a></li>
+      <li><a href="./support.html" class="nav-link">Support</a></li>
+    </ul>
+    <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
+      <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
+      <span>Open-source</span>
+    </a>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <article class="article">
+    <header class="article-head">
+      <a class="back-link" href="./blog.html">← all posts</a>
+      <div class="post-meta" style="margin-bottom:10px">
+        <span>Yavin series</span>
+        <span class="sep">·</span>
+        <span>part 2 of 3</span>
+      </div>
+      <h1 class="article-title">The stack behind Yavin: intelligence as infrastructure</h1>
+      <p class="article-desc">Building an AI editor that actually understands code is very different from building a simple AI wrapper. This is the architecture underneath — and why intelligence has to be part of the system rather than a layer on top of it.</p>
+
+      <div class="author">
+        <img src="./assets/portrait.jpg" alt="Salman Ansari" width="36" height="36" />
+        <div>
+          <div class="author-name">Salman Ansari</div>
+          <div class="author-meta"><time datetime="2026-01-24">24 January 2026</time> · 7 min read</div>
+        </div>
+      </div>
+    </header>
+
+    <figure class="figure">
+      <img src="./assets/blog/yavin-stack-2.jpg" alt="Yavin with an Agent Session panel open on the right: the agent is fixing a ChatPanel syntax error, listing files edited and step-by-step progress updates, with a diff to review and a model selector at the bottom." width="800" height="412" loading="lazy" />
+      <figcaption>An agent session in Yavin — investigating a syntax error, reading the terminal, editing the file, and handing back a diff to review.</figcaption>
+    </figure>
+
+    <p><a class="link" href="./blog-introducing-yavin.html">Yesterday I shared the vision behind Yavin</a>. Today it's the stack — and the architectural decision underneath all of it.</p>
+
+    <div class="quote-card">
+      <div class="quote-head">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM3 9.5h4v11H3v-11ZM9.5 9.5h3.8v1.5h.05c.53-.95 1.83-1.95 3.76-1.95 4.02 0 4.76 2.5 4.76 5.76v5.69h-4v-5.05c0-1.2-.02-2.75-1.78-2.75-1.78 0-2.05 1.3-2.05 2.66v5.14h-4v-11Z"/></svg>
+        <span>The original post · LinkedIn · 24 Jan 2026</span>
+      </div>
+      <p>Yesterday, I shared the vision behind Yavin. Today, I want to briefly talk about the stack.</p>
+      <p>Building an AI editor that actually understands code is very different from building a simple AI wrapper. It requires an architecture where intelligence is part of the system itself, not something added on top. Yavin is designed as a multi-agent system where planning, exploration, coding, and validation work together to reason over the entire codebase.</p>
+      <p>Under the hood, the stack is built for speed and scale, combining high-performance indexing, a modern editor interface, and a backend optimized for orchestration and context awareness. Instead of treating AI as a feature, Yavin treats it as core infrastructure for development.</p>
+    </div>
+
+    <h2>Wrapper vs. infrastructure</h2>
+    <p>The quickest way to build an "AI editor" is to put a chat box next to a text buffer and forward whatever is on screen to a model. It demos well. It also hits a wall immediately, because the model only ever knows what happened to be visible.</p>
+    <p>Treating AI as <span class="mark-strong">core infrastructure</span> means the opposite arrangement: the system already knows the shape of the codebase, and the model is called <em>into</em> that knowledge. Retrieval, parsing and dependency mapping aren't features bolted onto an editor — they're the substrate the editor is built on.</p>
+
+    <div class="alert alert-tip">
+      <span class="ico" aria-hidden="true">✓</span>
+      <div>A simple test for which kind of tool you're using: ask it to change something that lives in a file you don't have open. A wrapper can't. Infrastructure can.</div>
+    </div>
+
+    <h2>Four agents, one task</h2>
+    <p>Yavin is a multi-agent system, and the split is by <span class="mark">role</span> rather than by model. Four responsibilities work together to reason over the whole codebase:</p>
+
+    <div class="pillar">
+      <h3><span class="num">01</span> Planning</h3>
+      <p>Turns an outcome into ordered steps. A request like "fix this error" is not one action — it's locate, understand, change, verify. The plan is what makes the rest of the work inspectable rather than a single opaque jump to an answer.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">02</span> Exploration</h3>
+      <p>Gathers the evidence: which files are involved, what the terminal said, what calls the thing being changed. This is where indexing and dependency mapping get spent, and it's the step most "AI wrapper" tools skip entirely.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">03</span> Coding</h3>
+      <p>Writes the actual edit, against real retrieved context rather than a guess at the surrounding code. One concrete edit, attributable to one step of the plan.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">04</span> Validation</h3>
+      <p>Checks the work — does it build, do the tests pass, did the error go away? Without this step an agent is just a confident autocomplete. With it, the system can notice it was wrong and <span class="mark">self-correct</span>.</p>
+    </div>
+
+    <h2>What that looks like in practice</h2>
+    <p>The screenshot at the top of this post is the loop running. Reading the agent session panel top to bottom:</p>
+    <ul class="list">
+      <li><span class="mark">Investigating</span> — the agent analyses the file and reads the <span class="mark">npm run dev</span> terminal output to see the real error, rather than trusting the description of it.</li>
+      <li><span class="mark">Thinking</span> — a visible pause while it works out what to do, not a hidden one.</li>
+      <li><span class="mark">Restoring the file with correct content</span> — the edit itself, with the exact file and line range it touched.</li>
+      <li><span class="mark">Files edited · Review changes · Open diff</span> — the output is a diff to accept, not a silent write.</li>
+    </ul>
+    <p>Every step names what it did and what it read. That transparency is the whole point: autonomy that can't be audited is just damage at speed.</p>
+
+    <h2>Underneath: speed, surface, orchestration</h2>
+    <p>The post describes three layers, and each one exists for a reason.</p>
+    <ul class="list">
+      <li><span class="mark-strong">High-performance indexing.</span> Exploration happens on every step of every task, so lookup cost is multiplied, not amortised. This is why v1.4.0 moved the indexer to Rust and picked up a <a class="link" href="./blog-introducing-yavin.html">50–60× speed boost</a>.</li>
+      <li><span class="mark-strong">A modern editor interface.</span> Agents are useless if the human can't follow them. The surface has to show sessions, progress, diffs and file changes as first-class things — which is exactly what the panel on the right of that screenshot is.</li>
+      <li><span class="mark-strong">A backend built for orchestration and context awareness.</span> Routing steps to appropriate models, holding the plan, and assembling the context each call needs. This is the piece that stops a multi-agent system from being multiple disconnected chats.</li>
+    </ul>
+
+    <h2>Where it started</h2>
+    <p>None of this appeared fully formed. The <a class="link" href="https://github.com/salmanwnl44/Yavin-v1.2.0" target="_blank" rel="noopener">v1.2.0</a> scaffold was deliberately plain — a week-one skeleton with the services wired together and nothing clever in them yet.</p>
+
+    <figure class="figure">
+      <img src="./assets/blog/yavin-stack-1.jpg" alt="The YAVIN v1.2.0 README: a week-one scaffold with docker-compose for postgres, backend, frontend and a qdrant placeholder, a minimal FastAPI backend, a Vite and React frontend, and env and gitignore files." width="1154" height="834" loading="lazy" />
+      <figcaption>The v1.2.0 scaffold — docker-compose, a FastAPI backend, a Vite + React frontend, and a placeholder for the vector store.</figcaption>
+    </figure>
+
+    <p>What that scaffold got right was the <span class="mark">seams</span>: a separate backend for orchestration, a slot for a vector store, and local services that come up with one command. The intelligence could then be grown inside those boundaries — a Rust indexer here, AST parsing there — without rebuilding the house each time.</p>
+
+    <div class="alert alert-warn">
+      <span class="ico" aria-hidden="true">!</span>
+      <div>Starting with a boring scaffold is underrated. The parts that later became interesting — indexing, context, orchestration — all needed a place to live before they were worth writing.</div>
+    </div>
+
+    <h2>Next</h2>
+    <p>Tomorrow: why AST-based understanding changes how AI interacts with code — the difference between an editor that reads your files as text and one that reads them as structure.</p>
+    <p>And the question I'd genuinely like answers to: if you're building AI tools for developers, what's the biggest challenge you've faced in making AI understand large codebases?</p>
+
+    <h2>Resources</h2>
+    <ul class="list">
+      <li><a class="link" href="https://www.linkedin.com/posts/salmanwnl_ai-devtools-softwareengineering-ugcPost-7420866328938442752-ra7G/" target="_blank" rel="noopener">The original post on LinkedIn</a> — 24 January 2026.</li>
+      <li><a class="link" href="./blog-introducing-yavin.html">Part 1 — Introducing Yavin</a>, the vision and the v1.4.0 foundations.</li>
+      <li><a class="link" href="https://github.com/salmanwnl44/Yavin-v1.2.0" target="_blank" rel="noopener">Yavin v1.2.0</a> — the scaffold pictured above.</li>
+      <li><a class="link" href="https://github.com/salmanwnl44/Yavin-Rust-1" target="_blank" rel="noopener">Yavin-Rust-1</a> — the current TypeScript + Rust codebase.</li>
+      <li><a class="link" href="./blog-sandboxing-test-runs.html">Running untrusted tests without handing over the machine</a> — how the validation step stays contained.</li>
+    </ul>
+
+    <div class="tag-row">
+      <span class="post-tag">#AI</span>
+      <span class="post-tag">#DevTools</span>
+      <span class="post-tag">#SoftwareEngineering</span>
+      <span class="post-tag">#Innovation</span>
+    </div>
+
+    <footer class="article-foot">
+      <a class="btn" href="./blog-introducing-yavin.html">← Part 1</a>
+      <a class="btn" href="https://www.linkedin.com/posts/salmanwnl_ai-devtools-softwareengineering-ugcPost-7420866328938442752-ra7G/" target="_blank" rel="noopener">Original post ↗</a>
+      <a class="btn" href="./blog.html">All posts</a>
+    </footer>
+  </article>
+</main>
+
+<footer class="footer">
+  <p class="footer-quote">"Ship it to someone who'll actually use it."</p>
+  <p class="footer-made">Designed &amp; Made with <span class="heart" aria-hidden="true">❤️</span></p>
+  <p class="footer-bottom">
+    <span><span data-year>2026</span>. All rights reserved</span>
+    <span data-clock-24>--:--:-- IST</span>
+  </p>
+</footer>
+
+<script src="./assets/main.js?v=202611120009" defer></script>
+</body>
+</html>

@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="./assets/styles.css?v=202611112353" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611120009" />
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -40,7 +40,8 @@
   </div>
 
   <section class="section">
-    <h2 class="section-title">Featured</h2>
+    <h2 class="section-title">The Yavin series</h2>
+    <p class="page-sub" style="margin:-8px 0 16px">Three days of build notes from the launch, expanded from the original posts.</p>
 
     <a class="post-card" href="./blog-introducing-yavin.html">
       <div class="post-meta">
@@ -48,7 +49,7 @@
         <span class="sep">·</span>
         <span>8 min read</span>
         <span class="sep">·</span>
-        <span>first post</span>
+        <span>part 1</span>
       </div>
       <h3 class="post-title">Introducing Yavin: an AI-agentic code editor</h3>
       <p class="post-excerpt">Autocomplete was a great start. This is the long version of the launch announcement — what Yavin is, and why each of the four v1.4.0 foundations exists: a Rust indexer that is 50–60× faster, model orchestration, multi-language AST parsing, and the Active Context Engine.</p>
@@ -60,6 +61,41 @@
       </div>
       <span class="post-read">Read the post →</span>
     </a>
+
+    <a class="post-card" href="./blog-yavin-stack.html">
+      <div class="post-meta">
+        <span>24 Jan 2026</span>
+        <span class="sep">·</span>
+        <span>7 min read</span>
+        <span class="sep">·</span>
+        <span>part 2</span>
+      </div>
+      <h3 class="post-title">The stack behind Yavin: intelligence as infrastructure</h3>
+      <p class="post-excerpt">Building an AI editor that actually understands code is very different from building a simple AI wrapper. The four agent roles — planning, exploration, coding and validation — the three layers underneath them, and the plain scaffold it all grew out of.</p>
+      <div class="post-tags">
+        <span class="post-tag">Architecture</span>
+        <span class="post-tag">Multi-agent</span>
+        <span class="post-tag">DevTools</span>
+      </div>
+      <span class="post-read">Read the post →</span>
+    </a>
+
+    <div class="post-card" style="cursor:default">
+      <div class="post-meta">
+        <span>25 Jan 2026</span>
+        <span class="sep">·</span>
+        <span>part 3</span>
+        <span class="sep">·</span>
+        <span class="post-draft">coming next</span>
+      </div>
+      <h3 class="post-title">Why AST-based understanding changes how AI interacts with code</h3>
+      <p class="post-excerpt">The difference between an editor that reads your files as text and one that reads them as structure — and what that buys an agent working across a large codebase.</p>
+      <div class="post-tags">
+        <span class="post-tag">AST</span>
+        <span class="post-tag">Context</span>
+        <span class="post-tag">Retrieval</span>
+      </div>
+    </div>
   </section>
 
   <section class="section">
@@ -123,6 +159,6 @@
   </p>
 </footer>
 
-<script src="./assets/main.js?v=202611112353" defer></script>
+<script src="./assets/main.js?v=202611120009" defer></script>
 </body>
 </html>
