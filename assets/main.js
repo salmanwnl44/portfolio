@@ -46,13 +46,18 @@
     Array.prototype.slice.call(clone.children).forEach(function (child) { track.appendChild(child); });
   });
 
-  /* ---------------- QR flip on the avatar ---------------- */
-  document.querySelectorAll('[data-qr-toggle]').forEach(function (btn) {
-    var wrap = btn.closest('[data-avatar]');
-    if (!wrap) return;
-    btn.addEventListener('click', function () {
-      var shown = wrap.classList.toggle('show-qr');
-      btn.setAttribute('aria-label', shown ? 'Hide QR code' : 'Show QR code');
+  /* ---------------- Photo flip (anime <-> real) ---------------- */
+  document.querySelectorAll('[data-avatar]').forEach(function (wrap) {
+    function toggleFlip() {
+      var flipped = wrap.classList.toggle('is-flipped');
+      wrap.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+    }
+    wrap.addEventListener('click', toggleFlip);
+    wrap.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleFlip();
+      }
     });
   });
 

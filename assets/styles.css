@@ -336,6 +336,41 @@ button {
   flex: none;
   width: 128px;
   height: 128px;
+  perspective: 900px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.avatar-card {
+  width: 128px;
+  height: 128px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-3xl);
+}
+
+.avatar-wrap.is-flipped .avatar-card {
+  transform: rotateY(180deg);
+}
+
+.avatar-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-3xl);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.avatar-front {
+  transform: rotateY(0deg);
+}
+
+.avatar-back {
+  transform: rotateY(180deg);
 }
 
 .avatar {
@@ -353,42 +388,27 @@ button {
   filter: grayscale(0);
 }
 
-.qr-toggle {
+.avatar-flip-btn {
   position: absolute;
-  top: 7px;
-  right: 7px;
+  bottom: 6px;
+  right: 6px;
   width: 26px;
   height: 26px;
   display: grid;
   place-items: center;
   border-radius: var(--radius-xl);
-  background: rgba(11, 13, 14, 0.82);
+  background: rgba(11, 13, 14, 0.85);
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
-  transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+  transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease, transform 0.25s ease;
+  z-index: 2;
+  cursor: pointer;
 }
 
-.qr-toggle:hover {
+.avatar-wrap:hover .avatar-flip-btn {
   color: #fff;
   border-color: var(--border-hover);
-}
-
-.qr-face {
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius-3xl);
-  background: #fff;
-  display: grid;
-  place-items: center;
-  padding: 8px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--duration-slow) ease;
-}
-
-.avatar-wrap.show-qr .qr-face {
-  opacity: 1;
-  pointer-events: auto;
+  transform: scale(1.08);
 }
 
 .hero-id {
@@ -522,8 +542,6 @@ button {
   align-items: center;
   gap: 11px;
   padding: 12px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
   border: 1px dashed var(--border-default);
   border-radius: var(--radius-sm);
   transition: border-color var(--duration-slow) ease;
@@ -1032,14 +1050,6 @@ button {
 
 /* ---------- projects ---------- */
 .project {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  margin-bottom: 14px;
-  transition: border-color var(--duration-slow) ease;
-}
-
-.project {
   border: 1px dashed var(--border-default);
   border-radius: var(--radius-sm);
   padding: 16px;
@@ -1200,13 +1210,6 @@ button {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-}
-
-.card {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  transition: border-color var(--duration-slow) ease;
 }
 
 .card {
@@ -1533,8 +1536,6 @@ button {
   display: block;
   padding: 16px;
   margin-bottom: 12px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
   border: 1px dashed var(--border-default);
   border-radius: var(--radius-sm);
   transition: border-color var(--duration-slow) ease;
@@ -1927,8 +1928,6 @@ button {
 .pillar {
   margin: 0 0 14px;
   padding: 14px 16px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
   border: 1px dashed var(--border-default);
   border-radius: var(--radius-sm);
 }
