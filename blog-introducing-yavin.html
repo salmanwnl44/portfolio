@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Introducing Yavin: an AI-agentic code editor — Salman Ansari</title>
+<meta name="description" content="Announcing Yavin v1.4.0 — an AI-agentic code editor built for autonomous development: a Rust-based indexer with a 50-60x speed boost, model orchestration, multi-language AST parsing and an Active Context Engine." />
+<meta name="author" content="Salman Ansari" />
+<meta name="theme-color" content="#0b0d0e" />
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Introducing Yavin: an AI-agentic code editor" />
+<meta property="og:description" content="Moving from assistance to autonomy — the v1.4.0 foundations behind Yavin." />
+<meta property="og:image" content="./assets/blog/yavin-launch.jpg" />
+<meta property="article:published_time" content="2026-01-23T10:28:14Z" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611112353" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Introducing Yavin: an AI-agentic code editor",
+  "datePublished": "2026-01-23T10:28:14Z",
+  "author": { "@type": "Person", "name": "Salman Ansari", "url": "https://github.com/salmanwnl44" },
+  "image": "./assets/blog/yavin-launch.jpg",
+  "keywords": "Yavin, AI agents, code editor, Rust, AST, developer tools"
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar" aria-label="Primary">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="./index.html" class="nav-link">Home</a></li>
+      <li><a href="./projects.html" class="nav-link">Projects</a></li>
+      <li><a href="./blog.html" class="nav-link is-active">Blog</a></li>
+      <li><a href="./resume.html" class="nav-link">Resume</a></li>
+      <li><a href="./analytics.html" class="nav-link">Analytics</a></li>
+      <li><a href="./support.html" class="nav-link">Support</a></li>
+    </ul>
+    <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
+      <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
+      <span>Open-source</span>
+    </a>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <article class="article">
+    <header class="article-head">
+      <a class="back-link" href="./blog.html">← all posts</a>
+      <h1 class="article-title">Introducing Yavin: an AI-agentic code editor</h1>
+      <p class="article-desc">Autocomplete was a great start. This is an IDE that thinks, plans and executes — and the v1.4.0 foundations that make that possible.</p>
+
+      <div class="author">
+        <img src="./assets/portrait.jpg" alt="Salman Ansari" width="36" height="36" />
+        <div>
+          <div class="author-name">Salman Ansari</div>
+          <div class="author-meta"><time datetime="2026-01-23">23 January 2026</time> · 8 min read</div>
+        </div>
+      </div>
+    </header>
+
+    <figure class="figure">
+      <img src="./assets/blog/yavin-launch.jpg" alt="The Yavin editor with a Python project open: file tree on the left, main.py showing SQLGenerator, SQLExecutor and DatabaseRetriever being wired together, and an integrated terminal panel below." width="800" height="520" />
+      <figcaption>Yavin running a live project — editor, file tree and integrated terminals in one surface.</figcaption>
+    </figure>
+
+    <p>I announced Yavin publicly on <strong style="color:var(--text-primary)">23 January 2026</strong>. This post is the long version of that announcement: what Yavin is, what shipped in v1.4.0, and why each piece exists.</p>
+
+    <div class="quote-card">
+      <div class="quote-head">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM3 9.5h4v11H3v-11ZM9.5 9.5h3.8v1.5h.05c.53-.95 1.83-1.95 3.76-1.95 4.02 0 4.76 2.5 4.76 5.76v5.69h-4v-5.05c0-1.2-.02-2.75-1.78-2.75-1.78 0-2.05 1.3-2.05 2.66v5.14h-4v-11Z"/></svg>
+        <span>The original announcement · LinkedIn · 23 Jan 2026</span>
+      </div>
+      <p>The software development landscape is shifting. While autocomplete was a great start, it is time for an IDE that actually thinks, plans, and executes.</p>
+      <p>Introducing Yavin: An AI-agentic code editor built for autonomous development.</p>
+      <p>The goal isn't just to build a better assistant, but a multi-agent ecosystem that actively participates in the development process. While you focus on architecture, Yavin's agents collaborate to solve complex tasks, manage backlogs, and self-correct errors.</p>
+      <p>Key foundations of the v1.4.0 release:</p>
+      <ul>
+        <li>High-performance Rust-based indexer (50–60x speed boost).</li>
+        <li>Intelligent model orchestration for speed and cost-efficiency.</li>
+        <li>Multi-language AST parsing (Python, TS, Rust, Go, Java).</li>
+        <li>Active Context Engine for deep dependency mapping.</li>
+      </ul>
+      <p>The future of coding is moving from assistance to autonomy.</p>
+    </div>
+
+    <h2>Why agentic, and not just better autocomplete</h2>
+    <p>Suggestion-based tools answer a narrow question: <em>given the last few lines, what comes next?</em> That is genuinely useful, and it is also the ceiling. The model never sees the task, only the cursor.</p>
+    <p>An agentic editor inverts that. You hand over an outcome — "make this endpoint paginated", "get this suite green" — and the system plans the steps, edits across files, runs things, reads what came back, and corrects itself. The unit of work becomes a <span class="mark-strong">task</span>, not a keystroke.</p>
+    <p>That shift only works if three things are true: the system must be able to <span class="mark">find</span> the relevant code quickly, <span class="mark">understand</span> its structure rather than its text, and <span class="mark">know what depends on what</span> before it changes anything. The v1.4.0 foundations map one-to-one onto those requirements.</p>
+
+    <h2>The four foundations of v1.4.0</h2>
+
+    <div class="pillar">
+      <h3><span class="num">01</span> Rust-based indexer — 50–60× faster</h3>
+      <p>Every agent action starts with a lookup: which files matter here? On a large repository a slow index makes the whole system feel broken, because the cost is paid again on every single step, not once per session. Moving the indexer to Rust took that cost from "noticeable" to "invisible" — a <span class="mark-strong">50–60× speed boost</span> over the previous implementation. Agents can afford to re-check their assumptions mid-task instead of guessing.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">02</span> Intelligent model orchestration</h3>
+      <p>Not every step deserves the same model. Classifying an intent, renaming a symbol and designing a refactor have wildly different difficulty — and wildly different price tags. Orchestration routes each step to an appropriate model, so simple work runs on something fast and cheap while the hard reasoning goes to a stronger model. For a tool that may take dozens of steps per task, this is the difference between usable and unaffordable.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">03</span> Multi-language AST parsing</h3>
+      <p>Most retrieval pipelines chop files into fixed-size text chunks, which cheerfully split a function in half. Parsing to an <span class="mark">abstract syntax tree</span> instead means the editor works in units the language actually has: functions, classes, imports, call sites. v1.4.0 covers <span class="mark-strong">Python, TypeScript, Rust, Go and Java</span>. An agent asked to change a function gets that whole function and its signature, not an arbitrary 40-line window of it.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">04</span> Active Context Engine</h3>
+      <p>Knowing <em>where</em> a symbol is defined is not enough; what matters before an edit is what breaks if you change it. The Active Context Engine does deep <span class="mark">dependency mapping</span> — tracing relationships across the codebase so the context handed to a model includes the callers and collaborators of the thing being changed, not just the file it lives in. This is what separates "the model guessed from one file" from "the model saw the blast radius".</p>
+    </div>
+
+    <div class="alert alert-tip">
+      <span class="ico" aria-hidden="true">✓</span>
+      <div>These four stack deliberately: the indexer makes lookups cheap, the AST makes results meaningful, dependency mapping makes them complete, and orchestration makes running all of it affordable. Remove any one and the autonomy story falls apart.</div>
+    </div>
+
+    <h2>A multi-agent ecosystem, not one assistant</h2>
+    <p>The design goal was never a smarter chat box. It was several agents that <span class="mark">collaborate</span> on a task, <span class="mark">manage backlogs</span>, and <span class="mark">self-correct errors</span> — while you stay on the architecture.</p>
+    <p>Self-correction is the part that changes the feel of the tool. A single-shot assistant produces an edit and stops; whether it compiled is your problem. An agent that can run the thing it just wrote, read the failure and try again is doing the loop you would otherwise do by hand.</p>
+
+    <h2>The question everyone asks: where are the brakes?</h2>
+    <p>The first substantive comment on the announcement went straight to it — trust boundaries, rollback, and human-in-the-loop control as autonomy increases. It's the right question, and it's where these tools get judged.</p>
+
+    <div class="alert alert-warn">
+      <span class="ico" aria-hidden="true">!</span>
+      <div>Autonomy without a review surface is just a faster way to break a repository. The more an agent can do unattended, the more the human needs a precise record of what it did.</div>
+    </div>
+
+    <p>Two mechanisms in Yavin answer this directly:</p>
+    <ul class="list">
+      <li><span class="mark">Side-by-side review.</span> Every AI change is shown against the original, and nothing lands until it's accepted. Autonomy decides <em>what to propose</em>; the human decides what gets kept.</li>
+      <li><span class="mark">A sandboxed execution engine.</span> Agents that run code need a hard boundary. Yavin's Rust and Tauri engine blocks unsafe commands and any file access outside the open project, with time limits, clean cancellation and crash handling so a run can always be ended.</li>
+    </ul>
+    <p>I wrote about that second piece separately — <a class="link" href="./blog-sandboxing-test-runs.html">running untrusted tests without handing over the machine</a>.</p>
+
+    <h2>Where this goes next</h2>
+    <p>v1.4.0 is the foundation, not the finish line. The interesting work ahead is in the agentic logic sitting on top of these primitives — planning, backlog management, and how agents hand work to each other.</p>
+    <p>The honest summary of the project: <span class="mark-strong">the future of coding is moving from assistance to autonomy</span>, and the unglamorous infrastructure — indexing, parsing, dependency mapping, sandboxing — is what decides whether that's trustworthy or just fast.</p>
+    <p>If an AI agent could take over one repetitive part of your workflow today, what would you hand over first?</p>
+
+    <h2>Resources</h2>
+    <ul class="list">
+      <li><a class="link" href="https://www.linkedin.com/posts/salmanwnl_softwaredevelopment-aiagents-yavinide-share-7420412038809661440-OLwT/" target="_blank" rel="noopener">The original announcement on LinkedIn</a> — 23 January 2026, including the discussion in the comments.</li>
+      <li><a class="link" href="https://github.com/salmanwnl44/Yavin-Rust-1" target="_blank" rel="noopener">Yavin-Rust-1 on GitHub</a> — the current TypeScript + Rust codebase.</li>
+      <li><a class="link" href="https://github.com/salmanwnl44/Yavin-v1.2.0" target="_blank" rel="noopener">Yavin v1.2.0</a> — the earlier Python-first release, where the retrieval layer was worked out.</li>
+      <li><a class="link" href="./blog-sandboxing-test-runs.html">Running untrusted tests without handing over the machine</a> — the sandbox behind the test panel.</li>
+      <li><a class="link" href="./projects.html">All projects</a> — Yavin, Scarif and the rest.</li>
+    </ul>
+
+    <div class="tag-row">
+      <span class="post-tag">#SoftwareDevelopment</span>
+      <span class="post-tag">#AIAgents</span>
+      <span class="post-tag">#YavinIDE</span>
+      <span class="post-tag">#Rust</span>
+      <span class="post-tag">#DeveloperTools</span>
+      <span class="post-tag">#ProductLaunch</span>
+      <span class="post-tag">#Programming</span>
+      <span class="post-tag">#Innovation</span>
+    </div>
+
+    <footer class="article-foot">
+      <a class="btn" href="./blog.html">← All posts</a>
+      <a class="btn" href="https://www.linkedin.com/posts/salmanwnl_softwaredevelopment-aiagents-yavinide-share-7420412038809661440-OLwT/" target="_blank" rel="noopener">Original post ↗</a>
+      <a class="btn" href="https://github.com/salmanwnl44/Yavin-Rust-1" target="_blank" rel="noopener">Yavin on GitHub ↗</a>
+    </footer>
+  </article>
+</main>
+
+<footer class="footer">
+  <p class="footer-quote">"Ship it to someone who'll actually use it."</p>
+  <p class="footer-made">Designed &amp; Made with <span class="heart" aria-hidden="true">❤️</span></p>
+  <p class="footer-bottom">
+    <span><span data-year>2026</span>. All rights reserved</span>
+    <span data-clock-24>--:--:-- IST</span>
+  </p>
+</footer>
+
+<script src="./assets/main.js?v=202611112353" defer></script>
+</body>
+</html>

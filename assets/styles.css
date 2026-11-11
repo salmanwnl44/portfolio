@@ -580,3 +580,42 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--border-default);
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
 }
+
+/* ---------- article figures + quotes ---------- */
+.figure { margin: 0 0 20px; }
+.figure img {
+  width: 100%; border: 1px solid var(--border-default); border-radius: var(--radius-xl);
+  background: var(--bg-skeleton); box-shadow: 0 2px 8px -4px #0006;
+}
+.figure figcaption {
+  margin-top: 9px; font-family: var(--font-mono); font-size: 0.72rem;
+  line-height: 1.6; color: var(--text-dim); text-align: center;
+}
+.quote-card {
+  margin: 0 0 20px; padding: 16px 18px;
+  border: 1px dashed var(--border-default); border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.015);
+}
+.quote-card .quote-head {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);
+}
+.quote-card p { font-size: 0.92rem; line-height: 1.75; color: var(--text-secondary); margin-bottom: 10px; }
+.quote-card p:last-child { margin-bottom: 0; }
+.quote-card ul { margin: 0 0 10px; display: flex; flex-direction: column; gap: 5px; }
+.quote-card ul li { position: relative; padding-left: 16px; font-size: 0.9rem; line-height: 1.6; color: var(--text-muted); }
+.quote-card ul li::before { content: '·'; position: absolute; left: 4px; color: var(--text-faintest); }
+
+.pillar {
+  margin: 0 0 14px; padding: 14px 16px;
+  border: 1px solid var(--border-default); border-radius: var(--radius-sm);
+}
+.pillar h3 { margin: 0 0 6px; font-size: 0.98rem; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.pillar .num {
+  font-family: var(--font-mono); font-size: 0.72rem; color: var(--cal-4);
+  border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 1px 7px;
+}
+.pillar p { margin-bottom: 0; font-size: 0.9rem; }
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.tag-row .post-tag { font-family: var(--font-mono); }
