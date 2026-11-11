@@ -97,6 +97,7 @@
   var calTotal = document.querySelector('[data-cal-total]');
 
   var CELL = 13;
+  var MIN_CELL = 8;
   var GAP = 3;
   var MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -140,18 +141,32 @@
       }
     }
 
-    calGrid.style.gridTemplateRows = 'repeat(7, ' + CELL + 'px)';
-    calGrid.style.width = (weeks * (CELL + GAP)) + 'px';
+    // Size cells so the whole year fits the container — no horizontal scroll,
+    // and the most recent (busiest) weeks stay on screen.
+    var scroller = calGrid.parentElement;
+    var available = (scroller ? scroller.clientWidth : 0) || 640;
+    var cell = Math.floor((available - (weeks - 1) * GAP) / weeks);
+    cell = Math.max(MIN_CELL, Math.min(CELL, cell));
+    var step = cell + GAP;
+
+    calGrid.style.gridTemplateRows = 'repeat(7, ' + cell + 'px)';
+    calGrid.style.width = (weeks * step - GAP) + 'px';
+    calGrid.style.setProperty('--cal-cell', cell + 'px');
 
     if (calMonths) {
-      calMonths.style.width = (weeks * (CELL + GAP)) + 'px';
+      calMonths.style.width = (weeks * step - GAP) + 'px';
       monthSpans.forEach(function (span) {
         var el = document.createElement('span');
         el.className = 'cal-month';
-        el.style.width = (span.weeks * (CELL + GAP)) + 'px';
+        el.style.width = (span.weeks * step) + 'px';
         el.textContent = MONTH_NAMES[span.month];
         calMonths.appendChild(el);
       });
+    }
+
+    // if it still overflows (narrow phones), show the most recent weeks first
+    if (scroller && scroller.scrollWidth > scroller.clientWidth) {
+      scroller.scrollLeft = scroller.scrollWidth;
     }
 
     if (calTotal) {
@@ -173,14 +188,28 @@
     return days;
   }
 
-  function levelFor(count, max) {
-    if (!count) return 0;
-    if (max <= 4) return Math.min(4, count);
-    var ratio = count / max;
-    if (ratio > 0.75) return 4;
-    if (ratio > 0.5) return 3;
-    if (ratio > 0.25) return 2;
-    return 1;
+  /* Quartiles over the active days only. Scaling against the single busiest
+     day flattens everything to level 1 when one day is an outlier. */
+  function levelScale(counts) {
+    var active = counts.filter(function (n) { return n > 0; }).sort(function (a, b) { return a - b; });
+    if (!active.length) return function () { return 0; };
+
+    function quantile(p) {
+      var idx = Math.min(active.length - 1, Math.floor(p * active.length));
+      return active[idx];
+    }
+
+    var q1 = quantile(0.25);
+    var q2 = quantile(0.5);
+    var q3 = quantile(0.75);
+
+    return function (count) {
+      if (!count) return 0;
+      if (count > q3) return 4;
+      if (count > q2) return 3;
+      if (count > q1) return 2;
+      return 1;
+    };
   }
 
   /* Fallback: GitHub isn't attributing commits to the profile graph, so build
@@ -249,14 +278,13 @@
 
     function paint(counts) {
       var days = emptyYear();
-      var max = 0;
       var total = 0;
       days.forEach(function (day) {
         day.count = counts[day.date] || 0;
         total += day.count;
-        if (day.count > max) max = day.count;
       });
-      days.forEach(function (day) { day.level = levelFor(day.count, max); });
+      var level = levelScale(days.map(function (day) { return day.count; }));
+      days.forEach(function (day) { day.level = level(day.count); });
 
       var label = total
         ? 'This year, I pushed ' + total.toLocaleString() + ' commits across my repositories'
