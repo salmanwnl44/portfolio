@@ -388,7 +388,26 @@ button {
   filter: grayscale(0);
 }
 
-.avatar-flip-btn {
+.qr-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-3xl);
+  background: #fff;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-slow) ease;
+  z-index: 5;
+}
+
+.avatar-wrap.show-qr .qr-face {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.qr-toggle {
   position: absolute;
   bottom: 6px;
   right: 6px;
@@ -401,11 +420,11 @@ button {
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
   transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease, transform 0.25s ease;
-  z-index: 2;
+  z-index: 6;
   cursor: pointer;
 }
 
-.avatar-wrap:hover .avatar-flip-btn {
+.avatar-wrap:hover .qr-toggle {
   color: #fff;
   border-color: var(--border-hover);
   transform: scale(1.08);

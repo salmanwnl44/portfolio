@@ -55,15 +55,46 @@
       if (wrap.dataset.flipInited) return;
       wrap.dataset.flipInited = 'true';
       function toggleFlip() {
+        if (wrap.classList.contains('show-qr')) {
+          wrap.classList.remove('show-qr');
+          return;
+        }
         var flipped = wrap.classList.toggle('is-flipped');
         wrap.setAttribute('aria-expanded', flipped ? 'true' : 'false');
       }
-      wrap.addEventListener('click', toggleFlip);
+      wrap.addEventListener('click', function (e) {
+        if (e.target.closest('[data-qr-toggle]') || e.target.closest('.qr-face')) return;
+        toggleFlip();
+      });
       wrap.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') {
+          if (e.target.closest('[data-qr-toggle]')) return;
           e.preventDefault();
           toggleFlip();
         }
+      });
+    });
+
+    /* ---------------- QR toggle ---------------- */
+    document.querySelectorAll('[data-qr-toggle]').forEach(function (btn) {
+      if (btn.dataset.qrInited) return;
+      btn.dataset.qrInited = 'true';
+      var wrap = btn.closest('[data-avatar]');
+      if (!wrap) return;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var shown = wrap.classList.toggle('show-qr');
+        btn.setAttribute('aria-label', shown ? 'Hide QR code' : 'Show QR code');
+      });
+    });
+
+    document.querySelectorAll('.qr-face').forEach(function (face) {
+      if (face.dataset.closeInited) return;
+      face.dataset.closeInited = 'true';
+      face.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var wrap = face.closest('[data-avatar]');
+        if (wrap) wrap.classList.remove('show-qr');
       });
     });
 
