@@ -24,7 +24,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/styles.css?v=202611120155" />
+  <link rel="stylesheet" href="./assets/styles.css?v=202611120207" />
 
   <script type="application/ld+json">
 {
@@ -92,7 +92,25 @@
         </div>
 
         <div class="hero-id">
-          <h1 class="hero-name">Salman Ansari <span class="emoji" aria-hidden="true">🚀</span></h1>
+          <h1 class="hero-name">Salman Ansari <span class="blood-flame" aria-hidden="true" title="blood flame">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="bloodFlameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0%" stop-color="#7f0909" />
+                  <stop offset="45%" stop-color="#dc2626" />
+                  <stop offset="85%" stop-color="#f87171" />
+                  <stop offset="100%" stop-color="#fecaca" />
+                </linearGradient>
+                <filter id="bloodFlameGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#dc2626" flood-opacity="0.8" />
+                </filter>
+              </defs>
+              <!-- Outer Flame -->
+              <path d="M12 2C10.5 4.5 8 7.5 8 11.5C8 13.8 9.2 15.6 10.4 16.5C10 15 10.3 13.2 11.5 12C12.2 14.5 14 15.8 14 18C14 18.5 13.8 19 13.5 19.5C16.8 18.6 18.5 15.5 18.5 12.5C18.5 7.5 14 5 12 2Z" fill="url(#bloodFlameGrad)" filter="url(#bloodFlameGlow)" />
+              <!-- Inner Core Ember -->
+              <path d="M12 9.5C10.8 11.5 10.5 13 11 15C11.5 14.2 12.2 13.8 12.8 13.2C13.5 14.2 14 15.2 14 16.8C15.2 15.8 15.8 14.2 15.8 12.5C15.8 10.8 14 9.8 12 9.5Z" fill="#fff" opacity="0.85" />
+            </svg>
+          </span></h1>
           <a class="hero-handle" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">@salmanwnl44</a>
 
           <p class="hero-status">
@@ -651,7 +669,7 @@
     </p>
   </footer>
 
-  <script src="./assets/main.js?v=202611120155" defer></script>
+  <script src="./assets/main.js?v=202611120207" defer></script>
 </body>
 
 </html>
