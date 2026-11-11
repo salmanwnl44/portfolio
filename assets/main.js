@@ -96,12 +96,13 @@
   var calMonths = document.querySelector('[data-cal-months]');
   var calTotal = document.querySelector('[data-cal-total]');
 
-  var CELL = 11;
+  var CELL = 13;
   var GAP = 3;
   var MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  function renderCalendar(days, total) {
+  function renderCalendar(days, total, label) {
     if (!calGrid) return;
+    calGrid.style.display = 'grid';
     calGrid.textContent = '';
     if (calMonths) calMonths.textContent = '';
 
@@ -154,26 +155,113 @@
     }
 
     if (calTotal) {
-      calTotal.textContent = 'This year, I achieved ' + total.toLocaleString() + ' contributions';
+      calTotal.textContent =
+        label || 'This year, I achieved ' + total.toLocaleString() + ' contributions';
     }
   }
 
-  // When GitHub reports no attributed contributions, an empty grid reading
-  // "0 contributions" looks worse than no grid at all.
-  function noContributions() {
-    var section = calGrid ? calGrid.closest('section') : null;
-    if (!section) return;
-    if (section.hasAttribute('data-cal-optional')) {
-      section.style.display = 'none';
-      return;
+  /* Build a day-by-day map for the last 53 weeks, zero-filled. */
+  function emptyYear() {
+    var days = [];
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var start = new Date(today);
+    start.setDate(start.getDate() - 370);
+    for (var d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+      days.push({ date: d.toISOString().slice(0, 10), count: 0, level: 0 });
     }
-    var box = section.querySelector('.boxed');
-    if (box) {
-      box.textContent = '';
-      var note = document.createElement('p');
-      note.style.cssText = 'font-size:.85rem;color:var(--text-dim);text-align:center;padding:14px 0';
-      note.textContent = 'No contribution data is being reported for this account right now.';
-      box.appendChild(note);
+    return days;
+  }
+
+  function levelFor(count, max) {
+    if (!count) return 0;
+    if (max <= 4) return Math.min(4, count);
+    var ratio = count / max;
+    if (ratio > 0.75) return 4;
+    if (ratio > 0.5) return 3;
+    if (ratio > 0.25) return 2;
+    return 1;
+  }
+
+  /* Fallback: GitHub isn't attributing commits to the profile graph, so build
+     the heatmap from the commits themselves across the user's own repos. */
+  function loadCommitHeatmap() {
+    var CACHE_KEY = 'cal-commits-v1';
+    var TTL = 12 * 60 * 60 * 1000;
+
+    try {
+      var cached = JSON.parse(window.localStorage.getItem(CACHE_KEY) || 'null');
+      if (cached && Date.now() - cached.at < TTL && cached.counts) {
+        paint(cached.counts);
+        return;
+      }
+    } catch (e) { /* storage unavailable */ }
+
+    var since = new Date();
+    since.setDate(since.getDate() - 370);
+    var sinceIso = since.toISOString();
+
+    function mine(commit) {
+      if (commit.author && commit.author.login) {
+        return commit.author.login.toLowerCase() === GITHUB_USER.toLowerCase();
+      }
+      var a = commit.commit && commit.commit.author;
+      return !!a && typeof a.name === 'string' && a.name.toLowerCase().indexOf('salman') > -1;
+    }
+
+    function fetchRepoCommits(repo, page, acc) {
+      var url = 'https://api.github.com/repos/' + repo.full_name +
+        '/commits?per_page=100&since=' + encodeURIComponent(sinceIso) + '&page=' + page;
+      return fetch(url)
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (list) {
+          if (!Array.isArray(list) || !list.length) return acc;
+          list.forEach(function (c) {
+            if (!mine(c)) return;
+            var when = c.commit && c.commit.author && c.commit.author.date;
+            if (!when) return;
+            var key = when.slice(0, 10);
+            acc[key] = (acc[key] || 0) + 1;
+          });
+          if (list.length === 100 && page < 3) return fetchRepoCommits(repo, page + 1, acc);
+          return acc;
+        })
+        .catch(function () { return acc; });
+    }
+
+    fetch('https://api.github.com/users/' + GITHUB_USER + '/repos?per_page=100&sort=pushed')
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (repos) {
+        if (!Array.isArray(repos)) throw new Error('no repos');
+        var own = repos.filter(function (r) { return !r.fork; }).slice(0, 8);
+        if (!own.length) throw new Error('no repos');
+        var counts = {};
+        return Promise.all(own.map(function (r) { return fetchRepoCommits(r, 1, counts); }))
+          .then(function () { return counts; });
+      })
+      .then(function (counts) {
+        try {
+          window.localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), counts: counts }));
+        } catch (e) { /* storage unavailable */ }
+        paint(counts);
+      })
+      .catch(function () { renderCalendar(emptyYear(), 0, 'Contribution data is unavailable right now'); });
+
+    function paint(counts) {
+      var days = emptyYear();
+      var max = 0;
+      var total = 0;
+      days.forEach(function (day) {
+        day.count = counts[day.date] || 0;
+        total += day.count;
+        if (day.count > max) max = day.count;
+      });
+      days.forEach(function (day) { day.level = levelFor(day.count, max); });
+
+      var label = total
+        ? 'This year, I pushed ' + total.toLocaleString() + ' commits across my repositories'
+        : 'No public activity recorded in the last year';
+      renderCalendar(days, total, label);
     }
   }
 
@@ -185,23 +273,12 @@
         if (!data || !Array.isArray(data.contributions) || !data.contributions.length) throw new Error('no data');
         var days = data.contributions.slice(-371);
         var total = days.reduce(function (sum, d) { return sum + (d.count || 0); }, 0);
-        if (total === 0) { noContributions(); return; }
+        // GitHub only counts commits whose author email is verified on the
+        // account; when nothing is attributed, fall back to real commit data.
+        if (total === 0) { loadCommitHeatmap(); return; }
         renderCalendar(days, total);
       })
-      .catch(function () {
-        // fall back to a static contribution image
-        calGrid.textContent = '';
-        if (calMonths) calMonths.textContent = '';
-        var img = document.createElement('img');
-        img.src = 'https://ghchart.rshah.org/8c8c8c/' + GITHUB_USER;
-        img.alt = 'GitHub contribution graph for ' + GITHUB_USER;
-        img.loading = 'lazy';
-        img.style.width = '100%';
-        calGrid.style.width = '100%';
-        calGrid.style.display = 'block';
-        calGrid.appendChild(img);
-        if (calTotal) calTotal.textContent = 'Contributions on GitHub';
-      });
+      .catch(function () { loadCommitHeatmap(); });
   }
 
   /* ---------------- live GitHub stats (public API) ---------------- */
