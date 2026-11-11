@@ -39,12 +39,12 @@
 <nav class="navbar" aria-label="Primary">
   <div class="nav-inner">
     <ul class="nav-links">
-      <li><a href="./index.html" class="nav-link">Home</a></li>
-      <li><a href="./projects.html" class="nav-link">Projects</a></li>
-      <li><a href="./blog.html" class="nav-link is-active">Blog</a></li>
-      <li><a href="./resume.html" class="nav-link">Resume</a></li>
-      <li><a href="./analytics.html" class="nav-link">Analytics</a></li>
-      <li><a href="./support.html" class="nav-link">Support</a></li>
+      <li><a href="./" class="nav-link">Home</a></li>
+      <li><a href="./projects" class="nav-link">Projects</a></li>
+      <li><a href="./blog" class="nav-link is-active">Blog</a></li>
+      <li><a href="./resume" class="nav-link">Resume</a></li>
+      <li><a href="./analytics" class="nav-link">Analytics</a></li>
+      <li><a href="./support" class="nav-link">Support</a></li>
     </ul>
     <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
       <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
@@ -56,7 +56,7 @@
 <main id="main" class="wrap">
   <article class="article">
     <header class="article-head">
-      <a class="back-link" href="./blog.html">← all posts</a>
+      <a class="back-link" href="./blog">← all posts</a>
       <div class="post-meta" style="margin-bottom:10px">
         <span>Yavin series</span>
         <span class="sep">·</span>
@@ -79,7 +79,7 @@
       <figcaption>An agent session in Yavin — investigating a syntax error, reading the terminal, editing the file, and handing back a diff to review.</figcaption>
     </figure>
 
-    <p><a class="link" href="./blog-introducing-yavin.html">Yesterday I shared the vision behind Yavin</a>. Today it's the stack — and the architectural decision underneath all of it.</p>
+    <p><a class="link" href="./blog-introducing-yavin">Yesterday I shared the vision behind Yavin</a>. Today it's the stack — and the architectural decision underneath all of it.</p>
 
     <div class="quote-card">
       <div class="quote-head">
@@ -136,7 +136,7 @@
     <h2>Underneath: speed, surface, orchestration</h2>
     <p>The post describes three layers, and each one exists for a reason.</p>
     <ul class="list">
-      <li><span class="mark-strong">High-performance indexing.</span> Exploration happens on every step of every task, so lookup cost is multiplied, not amortised. This is why v1.4.0 moved the indexer to Rust and picked up a <a class="link" href="./blog-introducing-yavin.html">50–60× speed boost</a>.</li>
+      <li><span class="mark-strong">High-performance indexing.</span> Exploration happens on every step of every task, so lookup cost is multiplied, not amortised. This is why v1.4.0 moved the indexer to Rust and picked up a <a class="link" href="./blog-introducing-yavin">50–60× speed boost</a>.</li>
       <li><span class="mark-strong">A modern editor interface.</span> Agents are useless if the human can't follow them. The surface has to show sessions, progress, diffs and file changes as first-class things — which is exactly what the panel on the right of that screenshot is.</li>
       <li><span class="mark-strong">A backend built for orchestration and context awareness.</span> Routing steps to appropriate models, holding the plan, and assembling the context each call needs. This is the piece that stops a multi-agent system from being multiple disconnected chats.</li>
     </ul>
@@ -163,7 +163,7 @@
     <h2>Resources</h2>
     <ul class="list">
       <li><a class="link" href="https://www.linkedin.com/posts/salmanwnl_ai-devtools-softwareengineering-ugcPost-7420866328938442752-ra7G/" target="_blank" rel="noopener">The original post on LinkedIn</a> — 24 January 2026.</li>
-      <li><a class="link" href="./blog-introducing-yavin.html">Part 1 — Introducing Yavin</a>, the vision and the v1.4.0 foundations.</li>
+      <li><a class="link" href="./blog-introducing-yavin">Part 1 — Introducing Yavin</a>, the vision and the v1.4.0 foundations.</li>
       <li><a class="link" href="https://github.com/salmanwnl44/Yavin-v1.2.0" target="_blank" rel="noopener">Yavin v1.2.0</a> — the scaffold pictured above.</li>
       <li><a class="link" href="https://github.com/salmanwnl44/Yavin-Rust-1" target="_blank" rel="noopener">Yavin-Rust-1</a> — the current TypeScript + Rust codebase.</li>
     </ul>
@@ -176,9 +176,9 @@
     </div>
 
     <footer class="article-foot">
-      <a class="btn" href="./blog-introducing-yavin.html">← Part 1</a>
+      <a class="btn" href="./blog-introducing-yavin">← Part 1</a>
       <a class="btn" href="https://www.linkedin.com/posts/salmanwnl_ai-devtools-softwareengineering-ugcPost-7420866328938442752-ra7G/" target="_blank" rel="noopener">Original post ↗</a>
-      <a class="btn" href="./blog.html">All posts</a>
+      <a class="btn" href="./blog">All posts</a>
     </footer>
   </article>
 </main>
