@@ -332,15 +332,32 @@
     mount.textContent = '';
     var max = rows.reduce(function (m, r) { return Math.max(m, r.value); }, 0) || 1;
     rows.forEach(function (row) {
+      // divs, not spans: block display by default, so the fill can never be
+      // collapsed by an inline display rule.
       var wrap = document.createElement('div');
       wrap.className = 'bar-row';
-      wrap.innerHTML =
-        '<span class="bar-name"></span>' +
-        '<span class="bar-track"><span class="bar-fill"></span></span>' +
-        '<span class="bar-val"></span>';
-      wrap.querySelector('.bar-name').textContent = row.label;
-      wrap.querySelector('.bar-val').textContent = row.value;
-      wrap.querySelector('.bar-fill').style.width = Math.max(4, (row.value / max) * 100) + '%';
+
+      var name = document.createElement('div');
+      name.className = 'bar-name';
+      name.textContent = row.label;
+
+      var track = document.createElement('div');
+      track.className = 'bar-track';
+
+      var fill = document.createElement('div');
+      fill.className = 'bar-fill';
+      fill.style.width = Math.max(4, (row.value / max) * 100) + '%';
+      fill.style.height = '100%';
+      fill.style.background = 'linear-gradient(90deg, var(--cal-2), var(--cal-4))';
+      track.appendChild(fill);
+
+      var val = document.createElement('div');
+      val.className = 'bar-val';
+      val.textContent = row.value;
+
+      wrap.appendChild(name);
+      wrap.appendChild(track);
+      wrap.appendChild(val);
       mount.appendChild(wrap);
     });
   }
