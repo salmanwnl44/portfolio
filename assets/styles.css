@@ -143,7 +143,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 /* ---------- page shell ---------- */
 .wrap { max-width: var(--container-max); margin: 0 auto; padding: 0 var(--container-padding); }
 .section { scroll-margin-top: 60px; margin-bottom: 34px; }
-.hero { padding-top: 46px; }
+.hero { padding-top: 46px; margin-bottom: 44px; }
 
 /* corner-bracket section heading */
 .section-title {
