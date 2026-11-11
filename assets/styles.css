@@ -634,12 +634,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 /* ---------- contribution cell tooltip ---------- */
 .cal-grid { position: relative; }
-.cal-grid::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255, 60, 60, 0.16), rgba(255, 150, 50, 0.08), transparent);
-  transform: translateX(-100%); opacity: 0;
-}
-.cal-grid.is-sweeping::after { animation: blood-flame 0.9s cubic-bezier(0.4, 0, 0.2, 1); }
 
 .cal-day { transition: box-shadow 0.18s ease, transform 0.18s ease; }
 .cal-day.is-hot {
@@ -659,24 +653,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 .cal-tip.is-on { opacity: 1; transform: translate(-50%, -10px) scale(1); }
 .cal-tip span { position: relative; z-index: 1; }
-.cal-tip::before {
-  content: ''; position: absolute; inset: 0; z-index: 0;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(255, 60, 60, 0.55) 35%,
-    rgba(255, 140, 50, 0.45) 55%,
-    rgba(255, 210, 120, 0.25) 70%,
-    transparent 100%);
-  transform: translateX(-120%);
-}
-.cal-tip.is-on::before { animation: blood-flame 0.75s cubic-bezier(0.4, 0, 0.2, 1); }
 
-@keyframes blood-flame {
-  0%   { transform: translateX(-120%); opacity: 1; }
   100% { transform: translateX(120%);  opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cal-tip.is-on::before, .cal-grid.is-sweeping::after { animation: none; }
   .cal-day.is-hot { transform: none; }
 }

@@ -126,22 +126,12 @@
     var tip = ensureTip();
     tip.firstChild.textContent = text;
 
-    // restart the flame sweep on every hover
-    tip.classList.remove('is-on');
-    void tip.offsetWidth;
-
     var box = cell.getBoundingClientRect();
     tip.style.left = (box.left + box.width / 2) + 'px';
     tip.style.top = (box.top - tip.offsetHeight) + 'px';
     tip.classList.add('is-on');
 
     cell.classList.add('is-hot');
-
-    if (calGrid) {
-      calGrid.classList.remove('is-sweeping');
-      void calGrid.offsetWidth;
-      calGrid.classList.add('is-sweeping');
-    }
   }
 
   function hideTip(cell) {
@@ -160,7 +150,6 @@
     });
     grid.addEventListener('mouseleave', function () {
       hideTip(grid.querySelector('.cal-day.is-hot'));
-      grid.classList.remove('is-sweeping');
     });
   }
 
