@@ -363,6 +363,11 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .project-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 7px; }
 .project-name { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .project-name .lock { color: var(--accent-amber); }
+.chip-oss {
+  padding: 2px 9px; border-radius: var(--radius-lg);
+  background: var(--status-active-bg); color: var(--status-active);
+  font-size: 0.68rem; font-weight: 500; letter-spacing: 0.3px;
+}
 .project-actions { margin-left: auto; display: flex; gap: 7px; }
 .project-actions .btn { padding: 4px 10px; font-size: 0.78rem; }
 
