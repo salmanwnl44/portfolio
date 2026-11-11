@@ -145,20 +145,37 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .section { scroll-margin-top: 60px; margin-bottom: 34px; }
 .hero { padding-top: 46px; margin-bottom: 44px; }
 
-/* corner-bracket section heading */
+/* corner-bracket section heading — four detached crop marks, no full outline */
 .section-title {
+  --bracket-color: var(--text-dim);
+  --bracket-len: 11px;
+  --bracket-thickness: 1px;
+
   position: relative; display: inline-block;
-  margin: 0 0 18px; padding: 6px 14px;
-  border: 1px solid var(--border-default); border-radius: var(--radius-sm);
+  margin: 0 0 18px; padding: 9px 16px;
   font-size: 0.95rem; font-weight: 600; color: var(--text-primary); line-height: 1.2;
+
+  background-image:
+    linear-gradient(var(--bracket-color), var(--bracket-color)),
+    linear-gradient(var(--bracket-color), var(--bracket-color)),
+    linear-gradient(var(--bracket-color), var(--bracket-color)),
+    linear-gradient(var(--bracket-color), var(--bracket-color)),
+    linear-gradient(var(--bracket-color), var(--bracket-color)),
+    linear-gradient(var(--bracket-color), var(--bracket-color)),
+    linear-gradient(var(--bracket-color), var(--bracket-color)),
+    linear-gradient(var(--bracket-color), var(--bracket-color));
+  background-repeat: no-repeat;
+  background-size:
+    var(--bracket-len) var(--bracket-thickness), var(--bracket-thickness) var(--bracket-len),
+    var(--bracket-len) var(--bracket-thickness), var(--bracket-thickness) var(--bracket-len),
+    var(--bracket-len) var(--bracket-thickness), var(--bracket-thickness) var(--bracket-len),
+    var(--bracket-len) var(--bracket-thickness), var(--bracket-thickness) var(--bracket-len);
+  background-position:
+    left top, left top,
+    right top, right top,
+    left bottom, left bottom,
+    right bottom, right bottom;
 }
-.section-title::before,
-.section-title::after {
-  content: ''; position: absolute; left: 14px; right: 14px; height: 3px;
-  background: var(--bg-primary);
-}
-.section-title::before { top: -2px; }
-.section-title::after { bottom: -2px; }
 
 .boxed { border: 1px dashed var(--border-default); border-radius: var(--radius-lg); padding: 18px; }
 
