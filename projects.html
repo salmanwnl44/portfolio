@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Projects — Salman Ansari</title>
+<meta name="description" content="Every project by Salman Ansari — Yavin, Scarif, Scarif AI Database Editor, CV attendance system and more." />
+<meta name="theme-color" content="#0b0d0e" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar" aria-label="Primary">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="./index.html" class="nav-link">Home</a></li>
+      <li><a href="./projects.html" class="nav-link is-active">Projects</a></li>
+      <li><a href="./resume.html" class="nav-link">Resume</a></li>
+      <li><a href="./analytics.html" class="nav-link">Analytics</a></li>
+      <li><a href="./support.html" class="nav-link">Support</a></li>
+    </ul>
+    <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
+      <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
+      <span>Open-source</span>
+    </a>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div class="page-head">
+    <a class="back-link" href="./index.html">← back home</a>
+    <h1 class="page-title">All Projects</h1>
+    <p class="page-sub">Everything I've built end to end — AI tooling, distributed data services and computer vision.</p>
+  </div>
+
+  <section class="section">
+    <article class="project">
+      <div class="project-inner">
+        <div class="banner">
+          <img src="https://opengraph.githubassets.com/1/salmanwnl44/Yavin-Rust-1" alt="Yavin repository preview" loading="lazy" />
+          <span class="banner-badge">58 tests passing</span>
+          <span class="banner-badge right">IN DEVELOPMENT</span>
+        </div>
+        <div class="project-body">
+          <div class="project-head">
+            <h3 class="project-name">Yavin</h3>
+            <div class="project-actions">
+              <a class="btn" href="https://github.com/salmanwnl44/Yavin-Rust-1" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </div>
+          <p class="project-desc">An AI code editor where developers write, test and review code in one place. Suggestions draw on your own codebase rather than generic examples, and every AI change lands in a side-by-side review screen so you stay in control of what gets accepted.</p>
+          <ul class="project-points">
+            <li>Built-in test panel: find, run, stop and inspect tests without leaving the editor.</li>
+            <li>Secure Rust + Tauri execution engine that blocks unsafe commands and any file access outside the project.</li>
+            <li>Dependable runs: time limits, clean cancellation and crash handling, verified by 58 automated tests.</li>
+          </ul>
+          <p class="tech-label">Technologies Used:</p>
+          <div class="tech-row">
+            <span class="tech">React</span><span class="tech">TypeScript</span><span class="tech">Python</span><span class="tech">Rust</span><span class="tech">Tauri</span><span class="tech">RAG</span><span class="tech">Vitest</span><span class="tech">Jest</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="project-inner">
+        <div class="banner">
+          <img src="https://opengraph.githubassets.com/1/salmanwnl44/Yavin-v1.2.0" alt="Yavin v1.2.0 repository preview" loading="lazy" />
+          <span class="banner-badge">v1.2.0</span>
+        </div>
+        <div class="project-body">
+          <div class="project-head">
+            <h3 class="project-name">Yavin v1.2.0</h3>
+            <div class="project-actions">
+              <a class="btn" href="https://github.com/salmanwnl44/Yavin-v1.2.0" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </div>
+          <p class="project-desc">The earlier Python-first release of Yavin, where the editor's AI pipeline and retrieval layer were worked out before the Rust rewrite.</p>
+          <p class="tech-label">Technologies Used:</p>
+          <div class="tech-row">
+            <span class="tech">Python</span><span class="tech">JavaScript</span><span class="tech">Rust</span><span class="tech">RAG</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="project-inner">
+        <div class="banner">
+          <img src="https://opengraph.githubassets.com/1/salmanwnl44/yavin-architect" alt="Scarif repository preview" loading="lazy" />
+          <span class="banner-badge">10 nodes</span>
+        </div>
+        <div class="project-body">
+          <div class="project-head">
+            <h3 class="project-name">Scarif</h3>
+            <div class="project-actions">
+              <a class="btn" href="https://github.com/salmanwnl44/yavin-architect" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </div>
+          <p class="project-desc">A database service that spreads data across servers to handle growth — a SQL database split across 10 nodes, each packaged for repeatable deployment.</p>
+          <ul class="project-points">
+            <li>An API layer in front of the cluster, with traffic balanced so no single node becomes a bottleneck.</li>
+            <li>Health alerts that flag node failures early, before users notice.</li>
+          </ul>
+          <p class="tech-label">Technologies Used:</p>
+          <div class="tech-row">
+            <span class="tech">Docker</span><span class="tech">GCP</span><span class="tech">SQL</span><span class="tech">PostgreSQL</span><span class="tech">Cloud Monitoring</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="project-inner">
+        <div class="banner">
+          <img src="https://opengraph.githubassets.com/1/salmanwnl44/Scarif-AI-Database-Editor-v0.1.0" alt="Scarif AI Database Editor repository preview" loading="lazy" />
+          <span class="banner-badge">Live demo</span>
+        </div>
+        <div class="project-body">
+          <div class="project-head">
+            <h3 class="project-name">Scarif AI Database Editor</h3>
+            <div class="project-actions">
+              <a class="btn" href="https://scarif-ai-database-editor-v0-1-0.onrender.com/" target="_blank" rel="noopener">Live</a>
+              <a class="btn" href="https://github.com/salmanwnl44/Scarif-AI-Database-Editor-v0.1.0" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </div>
+          <p class="project-desc">An AI-powered database editor that turns natural language into SQL, backed by Google Gemini and Groq. Ask a question, read the generated query, run it against your schema.</p>
+          <p class="tech-label">Technologies Used:</p>
+          <div class="tech-row">
+            <span class="tech">JavaScript</span><span class="tech">Python</span><span class="tech">Gemini</span><span class="tech">Groq</span><span class="tech">SQL</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="project-inner">
+        <div class="banner">
+          <img src="https://opengraph.githubassets.com/1/roboflow/supervision" alt="Roboflow supervision repository preview" loading="lazy" />
+          <span class="banner-badge">Merged</span>
+        </div>
+        <div class="project-body">
+          <div class="project-head">
+            <h3 class="project-name">supervision · Roboflow</h3>
+            <div class="project-actions">
+              <a class="btn" href="https://github.com/roboflow/supervision" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </div>
+          <p class="project-desc">Open-source contribution: documented how to evaluate Hugging Face DETR models in supervision by converting PyTorch DataLoader targets into sv.Detections for mAP and confusion-matrix metrics — revised per maintainer review.</p>
+          <p class="tech-label">Technologies Used:</p>
+          <div class="tech-row">
+            <span class="tech">Python</span><span class="tech">PyTorch</span><span class="tech">Hugging Face</span><span class="tech">Computer Vision</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="project-inner">
+        <div class="banner">
+          <img src="https://opengraph.githubassets.com/1/salmanwnl44/openclaw" alt="OpenClaw repository preview" loading="lazy" />
+          <span class="banner-badge">Merged</span>
+        </div>
+        <div class="project-body">
+          <div class="project-head">
+            <h3 class="project-name">OpenClaw</h3>
+            <div class="project-actions">
+              <a class="btn" href="https://github.com/salmanwnl44/openclaw" target="_blank" rel="noopener">GitHub</a>
+            </div>
+          </div>
+          <p class="project-desc">Open-source contribution: a messaging integration and tool-calling fixes for OpenClaw, an open-source AI agent platform — accepted after maintainer review.</p>
+          <p class="tech-label">Technologies Used:</p>
+          <div class="tech-row">
+            <span class="tech">TypeScript</span><span class="tech">Node.js</span><span class="tech">LLM tool calling</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="project-inner">
+        <div class="project-body">
+          <div class="project-head">
+            <h3 class="project-name">CV Attendance System</h3>
+            <div class="project-actions">
+              <span class="tech">BIT Mesra · 2024</span>
+            </div>
+          </div>
+          <p class="project-desc">A computer-vision attendance system built during my internship and rolled out to faculty and admin staff, cutting manual tracking time by about 30%. Shaped by requirements gathered directly from senior faculty, with an analytics dashboard for classroom activity and scheduled jobs that process attendance logs automatically.</p>
+          <p class="tech-label">Technologies Used:</p>
+          <div class="tech-row">
+            <span class="tech">Python</span><span class="tech">OpenCV</span><span class="tech">Docker</span><span class="tech">React</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+</main>
+
+<footer class="footer">
+  <p class="footer-quote">"Ship it to someone who'll actually use it."</p>
+  <p class="footer-made">Designed &amp; Made with <span class="heart" aria-hidden="true">❤️</span></p>
+  <p class="footer-bottom">
+    <span><span data-year>2026</span>. All rights reserved</span>
+    <span data-clock-24>--:--:-- IST</span>
+  </p>
+</footer>
+
+<script src="./assets/main.js" defer></script>
+</body>
+</html>
