@@ -77,37 +77,21 @@
       }
       var now = audioCtx.currentTime;
 
-      // Soft, clean electronic UI blip / synth chirp (pleasant, subtle, futuristic)
-      var osc1 = audioCtx.createOscillator();
-      var gain1 = audioCtx.createGain();
+      // Authentic digital UI click / tech blip (square/triangle wave with precise 2-step pulse)
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
 
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(640, now);
-      osc1.frequency.exponentialRampToValueAtTime(1080, now + 0.045);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1760, now); // A6 note
+      osc.frequency.setValueAtTime(2637, now + 0.015); // E7 digital chime step
 
-      gain1.gain.setValueAtTime(0.12, now);
-      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
 
-      osc1.connect(gain1);
-      gain1.connect(audioCtx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.05);
-
-      // Subtle warm sub-tone
-      var osc2 = audioCtx.createOscillator();
-      var gain2 = audioCtx.createGain();
-
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(320, now);
-      osc2.frequency.exponentialRampToValueAtTime(540, now + 0.04);
-
-      gain2.gain.setValueAtTime(0.08, now);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
-
-      osc2.connect(gain2);
-      gain2.connect(audioCtx.destination);
-      osc2.start(now);
-      osc2.stop(now + 0.045);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.04);
     } catch (e) {
       /* Audio context blocked or not supported */
     }
