@@ -77,59 +77,37 @@
       }
       var now = audioCtx.currentTime;
 
-      // 1. Sharp Katana Steel Clash transient
-      var clashOsc = audioCtx.createOscillator();
-      var clashGain = audioCtx.createGain();
-      clashOsc.type = 'sawtooth';
-      clashOsc.frequency.setValueAtTime(3200, now);
-      clashOsc.frequency.exponentialRampToValueAtTime(1100, now + 0.04);
+      // Soft, clean electronic UI blip / synth chirp (pleasant, subtle, futuristic)
+      var osc1 = audioCtx.createOscillator();
+      var gain1 = audioCtx.createGain();
 
-      clashGain.gain.setValueAtTime(0.24, now);
-      clashGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(640, now);
+      osc1.frequency.exponentialRampToValueAtTime(1080, now + 0.045);
 
-      clashOsc.connect(clashGain);
-      clashGain.connect(audioCtx.destination);
-      clashOsc.start(now);
-      clashOsc.stop(now + 0.045);
+      gain1.gain.setValueAtTime(0.12, now);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
 
-      // 2. High-pitched harmonic blade resonance ring (metallic ping ring-out)
-      var ringOsc = audioCtx.createOscillator();
-      var ringGain = audioCtx.createGain();
-      ringOsc.type = 'sine';
-      ringOsc.frequency.setValueAtTime(2450, now);
-      ringOsc.frequency.exponentialRampToValueAtTime(2420, now + 0.12);
+      osc1.connect(gain1);
+      gain1.connect(audioCtx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.05);
 
-      ringGain.gain.setValueAtTime(0.20, now);
-      ringGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      // Subtle warm sub-tone
+      var osc2 = audioCtx.createOscillator();
+      var gain2 = audioCtx.createGain();
 
-      ringOsc.connect(ringGain);
-      ringGain.connect(audioCtx.destination);
-      ringOsc.start(now);
-      ringOsc.stop(now + 0.12);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(320, now);
+      osc2.frequency.exponentialRampToValueAtTime(540, now + 0.04);
 
-      // 3. Fast metallic slice texture
-      var bufferSize = Math.floor(audioCtx.sampleRate * 0.06);
-      var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      var data = buffer.getChannelData(0);
-      for (var i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
-      }
-      var noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
+      gain2.gain.setValueAtTime(0.08, now);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
-      var filter = audioCtx.createBiquadFilter();
-      filter.type = 'highpass';
-      filter.frequency.setValueAtTime(3500, now);
-
-      var noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.12, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
-
-      noise.connect(filter);
-      filter.connect(noiseGain);
-      noiseGain.connect(audioCtx.destination);
-      noise.start(now);
-      noise.stop(now + 0.06);
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+      osc2.start(now);
+      osc2.stop(now + 0.045);
     } catch (e) {
       /* Audio context blocked or not supported */
     }
