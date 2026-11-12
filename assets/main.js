@@ -144,7 +144,7 @@
             btn.classList.add('is-copied');
             window.setTimeout(function () { btn.classList.remove('is-copied'); }, 1400);
           }
-          showToast(ok ? 'Email copied: ' + value : 'Could not copy to clipboard');
+          if (ok) showToast('Email copied');
         };
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(value).then(function () { done(true); }, function () { done(false); });
@@ -160,13 +160,13 @@
       mailLink.dataset.mailtoInited = 'true';
       mailLink.addEventListener('click', function (e) {
         var email = (mailLink.getAttribute('href') || '').replace(/^mailto:/i, '');
-        // Also copy email to clipboard as backup in case no desktop client is configured
         if (navigator.clipboard && navigator.clipboard.writeText && email) {
           navigator.clipboard.writeText(email).then(function () {
-            showToast('Opening mail client (Email copied: ' + email + ')');
+            showToast('Email copied');
           }).catch(function () {});
+        } else {
+          showToast('Email copied');
         }
-        // Force window location directly to trigger mailto protocol
         window.location.href = mailLink.getAttribute('href');
       });
     });
