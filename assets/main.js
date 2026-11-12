@@ -39,10 +39,33 @@
     window.setInterval(tick, 1000);
   }
 
-  /* ---------------- blood-red firecracker sky burst & sound ---------------- */
+  /* ---------------- high-quality blood sparks physics & audio ---------------- */
   var audioCtx = null;
+  var sparkCanvas = null;
+  var sparkCtx = null;
+  var activeSparks = [];
+  var animFrameId = null;
 
-  function playFirecrackerPopSound() {
+  function ensureSparkCanvas() {
+    if (sparkCanvas) return sparkCanvas;
+    sparkCanvas = document.createElement('canvas');
+    sparkCanvas.className = 'blood-sparks-canvas';
+    document.body.appendChild(sparkCanvas);
+    sparkCtx = sparkCanvas.getContext('2d');
+
+    function resize() {
+      if (!sparkCanvas) return;
+      var dpr = window.devicePixelRatio || 1;
+      sparkCanvas.width = window.innerWidth * dpr;
+      sparkCanvas.height = window.innerHeight * dpr;
+      if (sparkCtx) sparkCtx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    return sparkCanvas;
+  }
+
+  function playSparkCrackleSound() {
     try {
       if (!audioCtx) {
         var AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -54,95 +77,132 @@
       }
       var now = audioCtx.currentTime;
 
-      // 1. Initial crisp pop / detonation crack
-      var popOsc = audioCtx.createOscillator();
-      var popGain = audioCtx.createGain();
-      popOsc.type = 'triangle';
-      popOsc.frequency.setValueAtTime(850, now);
-      popOsc.frequency.exponentialRampToValueAtTime(120, now + 0.05);
+      // Crisp snap
+      var snap = audioCtx.createOscillator();
+      var snapGain = audioCtx.createGain();
+      snap.type = 'triangle';
+      snap.frequency.setValueAtTime(1100, now);
+      snap.frequency.exponentialRampToValueAtTime(320, now + 0.035);
+      snapGain.gain.setValueAtTime(0.06, now);
+      snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+      snap.connect(snapGain);
+      snapGain.connect(audioCtx.destination);
+      snap.start(now);
+      snap.stop(now + 0.035);
 
-      popGain.gain.setValueAtTime(0.08, now);
-      popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
-
-      popOsc.connect(popGain);
-      popGain.connect(audioCtx.destination);
-      popOsc.start(now);
-      popOsc.stop(now + 0.05);
-
-      // 2. Firecracker air burst sizzle / crackle
-      var bufferSize = audioCtx.sampleRate * 0.14;
+      // Sizzling sparks sound
+      var bufferSize = audioCtx.sampleRate * 0.12;
       var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       var data = buffer.getChannelData(0);
       for (var i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
       }
       var noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
 
       var filter = audioCtx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(1200, now);
-      filter.frequency.exponentialRampToValueAtTime(400, now + 0.12);
-      filter.Q.setValueAtTime(1.8, now);
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(1600, now);
 
       var noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.09, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+      noiseGain.gain.setValueAtTime(0.05, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
 
       noise.connect(filter);
       filter.connect(noiseGain);
       noiseGain.connect(audioCtx.destination);
       noise.start(now);
-      noise.stop(now + 0.14);
+      noise.stop(now + 0.12);
     } catch (e) {
       /* Audio context blocked or not supported */
     }
   }
 
-  function spawnFirecrackerBurst(x, y) {
-    var burst = document.createElement('div');
-    burst.className = 'click-firework-burst';
-    burst.style.left = x + 'px';
-    burst.style.top = y + 'px';
+  function updateSparks() {
+    if (!sparkCtx) return;
+    sparkCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    // Expanding central shockwave flash ring
-    var ring = document.createElement('div');
-    ring.className = 'firework-flash-ring';
-    burst.appendChild(ring);
+    for (var i = activeSparks.length - 1; i >= 0; i--) {
+      var s = activeSparks[i];
+      s.life++;
 
-    // Mid-size 360-degree fireworks burst (10 radial spark particles)
-    var count = 10;
-    var colors = ['#fff0f3', '#ff3355', '#ff1744', '#dc2626', '#b91c1c', '#f43f5e'];
+      // Physics: velocity + slight drag + gravity
+      s.x += s.vx;
+      s.y += s.vy;
+      s.vx *= 0.94;
+      s.vy = s.vy * 0.94 + 0.16; // gravity
 
-    for (var i = 0; i < count; i++) {
-      var spark = document.createElement('div');
-      spark.className = 'firework-spark';
+      var progress = s.life / s.maxLife;
+      if (progress >= 1) {
+        activeSparks.splice(i, 1);
+        continue;
+      }
 
-      // Distribute evenly in a circle with small organic jitter
-      var baseAngle = (i / count) * 360 + (Math.random() * 14 - 7);
-      var rad = baseAngle * (Math.PI / 180);
-      var distance = 24 + Math.random() * 26; // mid-size radius ~24-50px
+      var alpha = 1 - progress;
+      var len = Math.max(2, Math.sqrt(s.vx * s.vx + s.vy * s.vy) * 2.2);
 
-      var dx = Math.cos(rad) * distance;
-      var dy = Math.sin(rad) * distance;
+      sparkCtx.save();
+      sparkCtx.translate(s.x, s.y);
+      var angle = Math.atan2(s.vy, s.vx);
+      sparkCtx.rotate(angle);
 
-      spark.style.setProperty('--dx', dx.toFixed(1) + 'px');
-      spark.style.setProperty('--dy', dy.toFixed(1) + 'px');
-      spark.style.setProperty('--spark-color', colors[i % colors.length]);
+      // Glowing streak
+      sparkCtx.shadowColor = s.color;
+      sparkCtx.shadowBlur = 8;
 
-      burst.appendChild(spark);
+      var grad = sparkCtx.createLinearGradient(-len, 0, 0, 0);
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(0.7, s.color);
+      grad.addColorStop(1, '#ffffff');
+
+      sparkCtx.strokeStyle = grad;
+      sparkCtx.lineWidth = s.size * (1 - progress * 0.5);
+      sparkCtx.lineCap = 'round';
+
+      sparkCtx.beginPath();
+      sparkCtx.moveTo(-len, 0);
+      sparkCtx.lineTo(0, 0);
+      sparkCtx.stroke();
+      sparkCtx.restore();
     }
 
-    document.body.appendChild(burst);
-    window.setTimeout(function () {
-      if (burst.parentNode) burst.parentNode.removeChild(burst);
-    }, 550);
+    if (activeSparks.length > 0) {
+      animFrameId = requestAnimationFrame(updateSparks);
+    } else {
+      animFrameId = null;
+      if (sparkCtx) sparkCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
+  }
+
+  function spawnSparksBurst(x, y) {
+    ensureSparkCanvas();
+    var count = 18;
+    var colors = ['#ffffff', '#ff4d6d', '#ff1744', '#dc2626', '#b91c1c', '#fda4af'];
+
+    for (var i = 0; i < count; i++) {
+      var angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4 - 0.2);
+      var speed = 2.5 + Math.random() * 4.8;
+      activeSparks.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 1.5 + Math.random() * 1.5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 0,
+        maxLife: 26 + Math.floor(Math.random() * 14)
+      });
+    }
+
+    if (!animFrameId) {
+      animFrameId = requestAnimationFrame(updateSparks);
+    }
   }
 
   window.addEventListener('pointerdown', function (e) {
     if (e.button !== 0) return; // primary click only
-    spawnFirecrackerBurst(e.clientX, e.clientY);
-    playFirecrackerPopSound();
+    spawnSparksBurst(e.clientX, e.clientY);
+    playSparkCrackleSound();
   }, { passive: true });
 
   /* ---------------- page interactive components ---------------- */

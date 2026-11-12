@@ -725,70 +725,14 @@ button {
   justify-content: center;
 }
 
-/* ---------- blood-red firecracker sky burst effect ---------- */
-.click-firework-burst {
+/* ---------- blood sparks canvas overlay ---------- */
+.blood-sparks-canvas {
   position: fixed;
-  width: 0;
-  height: 0;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 99999;
-}
-
-/* Flash shockwave ring */
-.firework-flash-ring {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  left: -10px;
-  top: -10px;
-  border-radius: 50%;
-  border: 2px solid #ff3b5c;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(225, 29, 72, 0.4) 40%, rgba(136, 0, 21, 0) 75%);
-  box-shadow: 0 0 16px #ff1744, 0 0 28px #880015;
-  animation: fireworkRingPop 0.35s cubic-bezier(0.1, 0.85, 0.25, 1) forwards;
-}
-
-@keyframes fireworkRingPop {
-  0% {
-    transform: scale(0.2);
-    opacity: 1;
-  }
-  60% {
-    transform: scale(2.6);
-    opacity: 0.85;
-  }
-  100% {
-    transform: scale(4.2);
-    opacity: 0;
-  }
-}
-
-/* Radial firecracker spark streaks */
-.firework-spark {
-  position: absolute;
-  left: -2px;
-  top: -2px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--spark-color, #ff4d6d);
-  box-shadow: 0 0 8px #ff1744, 0 0 14px #880015;
-  animation: fireworkSparkBlast 0.5s cubic-bezier(0.12, 0.88, 0.3, 1) forwards;
-}
-
-@keyframes fireworkSparkBlast {
-  0% {
-    transform: translate(0, 0) scale(1.4);
-    opacity: 1;
-  }
-  65% {
-    transform: translate(calc(var(--dx) * 0.82), calc(var(--dy) * 0.82 + 3px)) scale(1);
-    opacity: 0.9;
-  }
-  100% {
-    transform: translate(var(--dx), calc(var(--dy) + 10px)) scale(0.2);
-    opacity: 0;
-  }
 }
 
 .btn:active,
