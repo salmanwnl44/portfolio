@@ -126,43 +126,70 @@
       var s = activeSparks[i];
       s.life++;
 
-      // Physics: velocity + slight drag + gravity
-      s.x += s.vx;
-      s.y += s.vy;
-      s.vx *= 0.92;
-      s.vy = s.vy * 0.92 + 0.12; // gentle gravity
-
       var progress = s.life / s.maxLife;
       if (progress >= 1) {
         activeSparks.splice(i, 1);
         continue;
       }
 
-      var len = Math.max(1.8, Math.sqrt(s.vx * s.vx + s.vy * s.vy) * 1.6);
+      if (s.isFlameCore) {
+        // Central flame tongue: flickers and rises slightly upward
+        s.y += s.vy;
+        var flameScale = 1 - progress * 0.4;
+        var alpha = 1 - progress;
 
-      sparkCtx.save();
-      sparkCtx.translate(s.x, s.y);
-      var angle = Math.atan2(s.vy, s.vx);
-      sparkCtx.rotate(angle);
+        sparkCtx.save();
+        sparkCtx.translate(s.x, s.y);
+        sparkCtx.shadowColor = '#e11d48';
+        sparkCtx.shadowBlur = 12;
 
-      // Deep blood red glowing streak
-      sparkCtx.shadowColor = '#e11d48';
-      sparkCtx.shadowBlur = 5;
+        var coreGrad = sparkCtx.createRadialGradient(0, 2, 0, 0, 0, s.radius * flameScale);
+        coreGrad.addColorStop(0, 'rgba(255, 230, 230, ' + alpha * 0.95 + ')');
+        coreGrad.addColorStop(0.35, 'rgba(255, 30, 68, ' + alpha * 0.85 + ')');
+        coreGrad.addColorStop(0.7, 'rgba(185, 28, 28, ' + alpha * 0.6 + ')');
+        coreGrad.addColorStop(1, 'rgba(74, 0, 11, 0)');
 
-      var grad = sparkCtx.createLinearGradient(-len, 0, 0, 0);
-      grad.addColorStop(0, 'transparent');
-      grad.addColorStop(0.5, s.color);
-      grad.addColorStop(1, '#ff3344');
+        sparkCtx.fillStyle = coreGrad;
+        sparkCtx.beginPath();
+        // Teardrop flame shape
+        sparkCtx.ellipse(0, 0, s.radius * 0.75 * flameScale, s.radius * flameScale, 0, 0, Math.PI * 2);
+        sparkCtx.fill();
+        sparkCtx.restore();
+      } else {
+        // Bold spark streak: velocity + drag + subtle upward heat drift
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vx *= 0.90;
+        s.vy = s.vy * 0.90 - 0.08; // slight upward flame convection
 
-      sparkCtx.strokeStyle = grad;
-      sparkCtx.lineWidth = s.size * (1 - progress * 0.6);
-      sparkCtx.lineCap = 'round';
+        var len = Math.max(3.5, Math.sqrt(s.vx * s.vx + s.vy * s.vy) * 2.5);
 
-      sparkCtx.beginPath();
-      sparkCtx.moveTo(-len, 0);
-      sparkCtx.lineTo(0, 0);
-      sparkCtx.stroke();
-      sparkCtx.restore();
+        sparkCtx.save();
+        sparkCtx.translate(s.x, s.y);
+        var angle = Math.atan2(s.vy, s.vx);
+        sparkCtx.rotate(angle);
+
+        // Rich bolder glow
+        sparkCtx.shadowColor = '#ff1744';
+        sparkCtx.shadowBlur = 10;
+
+        var grad = sparkCtx.createLinearGradient(-len, 0, 0, 0);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(0.4, s.color);
+        grad.addColorStop(0.85, '#ff2a4b');
+        grad.addColorStop(1, '#ffe4e6');
+
+        sparkCtx.strokeStyle = grad;
+        // Bolder stroke width (2.5px - 4px)
+        sparkCtx.lineWidth = s.size * (1 - progress * 0.5);
+        sparkCtx.lineCap = 'round';
+
+        sparkCtx.beginPath();
+        sparkCtx.moveTo(-len, 0);
+        sparkCtx.lineTo(0, 0);
+        sparkCtx.stroke();
+        sparkCtx.restore();
+      }
     }
 
     if (activeSparks.length > 0) {
@@ -175,23 +202,36 @@
 
   function spawnSparksBurst(x, y) {
     ensureSparkCanvas();
+
+    // 1. Central miniature blood-flame core puff
+    activeSparks.push({
+      x: x,
+      y: y,
+      vy: -0.6, // gentle upward rise
+      radius: 9,
+      isFlameCore: true,
+      life: 0,
+      maxLife: 15
+    });
+
+    // 2. Bold blood sparks surrounding the flame
     var count = 10;
-    // Rich blood red & crimson Elden Ring tones
-    var colors = ['#dc2626', '#b91c1c', '#991b1b', '#e11d48', '#ff1744', '#7f1d1d'];
+    var colors = ['#dc2626', '#b91c1c', '#e11d48', '#ff1744', '#991b1b'];
 
     for (var i = 0; i < count; i++) {
-      var angle = (Math.PI * 2 * i) / count + (Math.random() * 0.5 - 0.25);
-      // Compact, small speed burst (~1.2 - 2.8px/frame)
-      var speed = 1.2 + Math.random() * 1.6;
+      var angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4 - 0.2);
+      // Compact size maintained (~1.3 - 2.6px)
+      var speed = 1.3 + Math.random() * 1.5;
       activeSparks.push({
         x: x,
         y: y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        size: 1.1 + Math.random() * 0.9,
+        size: 2.6 + Math.random() * 1.2, // Bolder width
         color: colors[Math.floor(Math.random() * colors.length)],
+        isFlameCore: false,
         life: 0,
-        maxLife: 16 + Math.floor(Math.random() * 8)
+        maxLife: 18 + Math.floor(Math.random() * 8)
       });
     }
 
