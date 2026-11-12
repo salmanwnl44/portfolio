@@ -430,6 +430,187 @@ button {
   transform: scale(1.08);
 }
 
+/* ==========================================================================
+   Bloodflame Katana Profile Overlay Styles
+   ========================================================================== */
+.bloodflame-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 180px;
+  height: 180px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  overflow: visible;
+}
+
+/* Faint crimson pulse behind the avatar */
+.katana-pulse-aura {
+  position: absolute;
+  inset: 12px;
+  border-radius: var(--radius-3xl);
+  background: radial-gradient(circle, rgba(220, 20, 60, 0.28) 0%, rgba(136, 0, 21, 0.12) 65%, transparent 100%);
+  filter: blur(14px);
+  opacity: 0.15;
+  transition: opacity 1.2s ease, transform 1.2s ease;
+  pointer-events: none;
+}
+
+.phase-enter .katana-pulse-aura {
+  opacity: 0.55;
+  transform: scale(1.08);
+}
+
+.phase-slash .katana-pulse-aura {
+  opacity: 0.85;
+  transform: scale(1.22);
+}
+
+.phase-dissipate .katana-pulse-aura {
+  opacity: 0.3;
+  transform: scale(1.05);
+}
+
+/* Floating Ember & Spark Canvas */
+.bloodflame-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* SVG Katana & Slash Rig */
+.katana-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Slash Arc Path Transitions */
+.slash-arc-outer,
+.slash-arc-core {
+  opacity: 0;
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+}
+
+.phase-slash .slash-arc-outer {
+  opacity: 0.95;
+  animation: arcStrikeOuter 0.52s cubic-bezier(0.12, 0.9, 0.2, 1) forwards;
+}
+
+.phase-slash .slash-arc-core {
+  opacity: 1;
+  animation: arcStrikeCore 0.45s cubic-bezier(0.1, 0.95, 0.18, 1) forwards;
+}
+
+.phase-dissipate .slash-arc-outer {
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+.phase-dissipate .slash-arc-core {
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
+}
+
+@keyframes arcStrikeOuter {
+  0% {
+    stroke-dashoffset: 260;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 16px #ff1744) drop-shadow(0 0 32px #7f0909);
+  }
+  45% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    filter: drop-shadow(0 0 22px #ff2a4b) drop-shadow(0 0 45px #4a000b);
+  }
+  100% {
+    stroke-dashoffset: -40;
+    opacity: 0.4;
+    filter: drop-shadow(0 0 8px #b91c1c);
+  }
+}
+
+@keyframes arcStrikeCore {
+  0% {
+    stroke-dashoffset: 260;
+    opacity: 1;
+  }
+  50% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -30;
+    opacity: 0.2;
+  }
+}
+
+/* Katana Rig Movement & Natural Swing Physics */
+.katana-rig {
+  opacity: 0;
+  transform-origin: 30px 40px;
+  transform: translate(220px, -40px) rotate(-65deg);
+}
+
+/* Phase 2: Weapon Appearance (Enter from top-right) */
+.phase-enter .katana-rig {
+  opacity: 1;
+  animation: katanaEnterBlade 0.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes katanaEnterBlade {
+  0% {
+    opacity: 0;
+    transform: translate(210px, -40px) rotate(-60deg) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(155px, -10px) rotate(-35deg) scale(1);
+    filter: drop-shadow(0 0 10px #ff1744);
+  }
+}
+
+/* Phase 3: Fast Elegant Diagonal Slash across profile */
+.phase-slash .katana-rig {
+  opacity: 1;
+  animation: katanaSlashAttack 0.55s cubic-bezier(0.12, 0.92, 0.2, 1) forwards;
+}
+
+@keyframes katanaSlashAttack {
+  0% {
+    opacity: 1;
+    transform: translate(155px, -10px) rotate(-35deg) scale(1);
+    filter: drop-shadow(0 0 12px #ff1744) drop-shadow(0 0 24px #7f0909);
+  }
+  25% {
+    transform: translate(105px, 60px) rotate(15deg) scale(1.05);
+    filter: drop-shadow(0 0 20px #ff2a4b) drop-shadow(0 0 35px #dc2626);
+  }
+  55% {
+    transform: translate(30px, 150px) rotate(68deg) scale(1.02);
+    filter: drop-shadow(0 0 16px #ff1744) drop-shadow(0 0 28px #7f0909);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50px, 220px) rotate(90deg) scale(0.95);
+    filter: drop-shadow(0 0 4px #7f0909);
+  }
+}
+
+/* Reduced Motion Safety */
+@media (prefers-reduced-motion: reduce) {
+  .bloodflame-overlay {
+    display: none !important;
+  }
+}
+
 .hero-id {
   padding-top: 2px;
   min-width: 0;
