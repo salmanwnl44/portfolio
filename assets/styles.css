@@ -725,30 +725,59 @@ button {
   justify-content: center;
 }
 
-/* ---------- click ripple effect ---------- */
-.click-ripple {
+/* ---------- blood-red flame click effect ---------- */
+.click-flame-burst {
   position: fixed;
-  width: 24px;
-  height: 24px;
-  margin-top: -12px;
-  margin-left: -12px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 70%);
+  width: 0;
+  height: 0;
   pointer-events: none;
   z-index: 99999;
-  transform: scale(0.2);
-  opacity: 1;
-  animation: clickRippleAnim 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes clickRippleAnim {
+.click-flame-core {
+  position: absolute;
+  width: 22px;
+  height: 28px;
+  left: -11px;
+  bottom: -6px;
+  background: radial-gradient(ellipse at 50% 80%, #ffffff 0%, #ff4d4d 35%, #b91c1c 70%, transparent 100%);
+  border-radius: 50% 50% 40% 40% / 70% 70% 30% 30%;
+  filter: drop-shadow(0 0 8px #dc2626) drop-shadow(0 -2px 14px #7f0909);
+  animation: flameIgnite 0.42s ease-out forwards;
+}
+
+@keyframes flameIgnite {
   0% {
-    transform: scale(0.3);
-    opacity: 0.9;
+    transform: scale(0.2) translateY(6px);
+    opacity: 0.95;
+  }
+  40% {
+    transform: scale(1.15) translateY(-6px) scaleX(0.85);
+    opacity: 1;
   }
   100% {
-    transform: scale(2.2);
+    transform: scale(0.4) translateY(-22px) scaleX(0.6);
+    opacity: 0;
+  }
+}
+
+.click-flame-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fca5a5;
+  box-shadow: 0 0 6px #dc2626;
+  animation: sparkFly 0.38s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
+}
+
+@keyframes sparkFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0);
     opacity: 0;
   }
 }
