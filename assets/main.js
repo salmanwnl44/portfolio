@@ -77,42 +77,22 @@
       }
       var now = audioCtx.currentTime;
 
-      // Crisp snap
-      var snap = audioCtx.createOscillator();
-      var snapGain = audioCtx.createGain();
-      snap.type = 'triangle';
-      snap.frequency.setValueAtTime(1100, now);
-      snap.frequency.exponentialRampToValueAtTime(320, now + 0.035);
-      snapGain.gain.setValueAtTime(0.06, now);
-      snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
-      snap.connect(snapGain);
-      snapGain.connect(audioCtx.destination);
-      snap.start(now);
-      snap.stop(now + 0.035);
+      // Clean, rich mechanical click with soft low-end body (like a premium mouse/switch tap)
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
 
-      // Sizzling sparks sound
-      var bufferSize = audioCtx.sampleRate * 0.12;
-      var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      var data = buffer.getChannelData(0);
-      for (var i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
-      }
-      var noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
 
-      var filter = audioCtx.createBiquadFilter();
-      filter.type = 'highpass';
-      filter.frequency.setValueAtTime(1600, now);
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
 
-      var noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.05, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
 
-      noise.connect(filter);
-      filter.connect(noiseGain);
-      noiseGain.connect(audioCtx.destination);
-      noise.start(now);
-      noise.stop(now + 0.12);
+      osc.start(now);
+      osc.stop(now + 0.04);
     } catch (e) {
       /* Audio context blocked or not supported */
     }
