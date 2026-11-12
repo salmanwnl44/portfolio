@@ -39,11 +39,10 @@
     window.setInterval(tick, 1000);
   }
 
-  /* ---------------- Rivers of Blood / Corpse Piler click slash & sound ---------------- */
+  /* ---------------- blood-red firecracker sky burst & sound ---------------- */
   var audioCtx = null;
-  var slashToggle = false;
 
-  function playCorpsePilerSlashSound() {
+  function playFirecrackerPopSound() {
     try {
       if (!audioCtx) {
         var AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -55,92 +54,95 @@
       }
       var now = audioCtx.currentTime;
 
-      // 1. Sharp high-frequency steel slash whip
-      var bladeOsc = audioCtx.createOscillator();
-      var bladeGain = audioCtx.createGain();
-      bladeOsc.type = 'sawtooth';
-      bladeOsc.frequency.setValueAtTime(1400, now);
-      bladeOsc.frequency.exponentialRampToValueAtTime(320, now + 0.06);
+      // 1. Initial crisp pop / detonation crack
+      var popOsc = audioCtx.createOscillator();
+      var popGain = audioCtx.createGain();
+      popOsc.type = 'triangle';
+      popOsc.frequency.setValueAtTime(850, now);
+      popOsc.frequency.exponentialRampToValueAtTime(120, now + 0.05);
 
-      bladeGain.gain.setValueAtTime(0.05, now);
-      bladeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+      popGain.gain.setValueAtTime(0.08, now);
+      popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
 
-      bladeOsc.connect(bladeGain);
-      bladeGain.connect(audioCtx.destination);
-      bladeOsc.start(now);
-      bladeOsc.stop(now + 0.06);
+      popOsc.connect(popGain);
+      popGain.connect(audioCtx.destination);
+      popOsc.start(now);
+      popOsc.stop(now + 0.05);
 
-      // 2. Heavy blood-flame burst whoosh
-      var bufferSize = audioCtx.sampleRate * 0.12;
+      // 2. Firecracker air burst sizzle / crackle
+      var bufferSize = audioCtx.sampleRate * 0.14;
       var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       var data = buffer.getChannelData(0);
       for (var i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.28));
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
       }
       var noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
 
       var filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(900, now);
-      filter.frequency.exponentialRampToValueAtTime(180, now + 0.11);
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1200, now);
+      filter.frequency.exponentialRampToValueAtTime(400, now + 0.12);
+      filter.Q.setValueAtTime(1.8, now);
 
       var noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.07, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+      noiseGain.gain.setValueAtTime(0.09, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
 
       noise.connect(filter);
       filter.connect(noiseGain);
       noiseGain.connect(audioCtx.destination);
       noise.start(now);
-      noise.stop(now + 0.12);
+      noise.stop(now + 0.14);
     } catch (e) {
       /* Audio context blocked or not supported */
     }
   }
 
-  function spawnCorpsePilerSlash(x, y) {
+  function spawnFirecrackerBurst(x, y) {
     var burst = document.createElement('div');
-    burst.className = 'click-flame-burst';
+    burst.className = 'click-firework-burst';
     burst.style.left = x + 'px';
     burst.style.top = y + 'px';
 
-    // Alternate diagonal katana swing angle (-38deg and 35deg like Corpse Piler combo)
-    slashToggle = !slashToggle;
-    var angle = slashToggle ? -38 : 34;
+    // Expanding central shockwave flash ring
+    var ring = document.createElement('div');
+    ring.className = 'firework-flash-ring';
+    burst.appendChild(ring);
 
-    var blade = document.createElement('div');
-    blade.className = 'blood-slash-blade';
-    blade.style.setProperty('--slash-angle', angle + 'deg');
-    burst.appendChild(blade);
+    // Mid-size 360-degree fireworks burst (10 radial spark particles)
+    var count = 10;
+    var colors = ['#fff0f3', '#ff3355', '#ff1744', '#dc2626', '#b91c1c', '#f43f5e'];
 
-    var core = document.createElement('div');
-    core.className = 'blood-slash-core';
-    burst.appendChild(core);
+    for (var i = 0; i < count; i++) {
+      var spark = document.createElement('div');
+      spark.className = 'firework-spark';
 
-    // Dynamic blood spray droplets along the swing trajectory
-    for (var i = 0; i < 5; i++) {
-      var spatter = document.createElement('div');
-      spatter.className = 'blood-slash-spatter';
-      var spread = (angle + (Math.random() * 50 - 25)) * (Math.PI / 180);
-      var dist = 16 + Math.random() * 26;
-      var dx = Math.cos(spread) * dist;
-      var dy = Math.sin(spread) * dist;
-      spatter.style.setProperty('--dx', dx.toFixed(1) + 'px');
-      spatter.style.setProperty('--dy', dy.toFixed(1) + 'px');
-      burst.appendChild(spatter);
+      // Distribute evenly in a circle with small organic jitter
+      var baseAngle = (i / count) * 360 + (Math.random() * 14 - 7);
+      var rad = baseAngle * (Math.PI / 180);
+      var distance = 24 + Math.random() * 26; // mid-size radius ~24-50px
+
+      var dx = Math.cos(rad) * distance;
+      var dy = Math.sin(rad) * distance;
+
+      spark.style.setProperty('--dx', dx.toFixed(1) + 'px');
+      spark.style.setProperty('--dy', dy.toFixed(1) + 'px');
+      spark.style.setProperty('--spark-color', colors[i % colors.length]);
+
+      burst.appendChild(spark);
     }
 
     document.body.appendChild(burst);
     window.setTimeout(function () {
       if (burst.parentNode) burst.parentNode.removeChild(burst);
-    }, 450);
+    }, 550);
   }
 
   window.addEventListener('pointerdown', function (e) {
     if (e.button !== 0) return; // primary click only
-    spawnCorpsePilerSlash(e.clientX, e.clientY);
-    playCorpsePilerSlashSound();
+    spawnFirecrackerBurst(e.clientX, e.clientY);
+    playFirecrackerPopSound();
   }, { passive: true });
 
   /* ---------------- page interactive components ---------------- */
