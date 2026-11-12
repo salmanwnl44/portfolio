@@ -720,22 +720,24 @@
     var link = e.target.closest('a');
     if (!link) return;
 
-    var href = link.getAttribute('href');
-    if (!href) return;
+    var rawHref = link.getAttribute('href') || '';
+    if (!rawHref) return;
 
+    // Directly allow external schemes, downloads, and blank targets
     if (
       link.target === '_blank' ||
       link.hasAttribute('download') ||
-      href.startsWith('mailto:') ||
-      href.startsWith('tel:') ||
-      href.startsWith('javascript:') ||
-      link.origin !== window.location.origin
+      rawHref.toLowerCase().indexOf('mailto:') === 0 ||
+      rawHref.toLowerCase().indexOf('tel:') === 0 ||
+      rawHref.toLowerCase().indexOf('javascript:') === 0 ||
+      (link.protocol && link.protocol.toLowerCase() === 'mailto:') ||
+      (link.origin && window.location.origin && link.origin !== window.location.origin)
     ) {
       return;
     }
 
-    if (href.startsWith('#')) return;
-    if (/\.(pdf|jpg|png|webp|svg|zip)$/i.test(href)) return;
+    if (rawHref.charAt(0) === '#') return;
+    if (/\.(pdf|jpg|png|webp|svg|zip)$/i.test(rawHref)) return;
 
     e.preventDefault();
     navigateTo(link.href, true);
