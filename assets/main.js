@@ -129,8 +129,8 @@
       // Physics: velocity + slight drag + gravity
       s.x += s.vx;
       s.y += s.vy;
-      s.vx *= 0.94;
-      s.vy = s.vy * 0.94 + 0.16; // gravity
+      s.vx *= 0.92;
+      s.vy = s.vy * 0.92 + 0.12; // gentle gravity
 
       var progress = s.life / s.maxLife;
       if (progress >= 1) {
@@ -138,25 +138,24 @@
         continue;
       }
 
-      var alpha = 1 - progress;
-      var len = Math.max(2, Math.sqrt(s.vx * s.vx + s.vy * s.vy) * 2.2);
+      var len = Math.max(1.8, Math.sqrt(s.vx * s.vx + s.vy * s.vy) * 1.6);
 
       sparkCtx.save();
       sparkCtx.translate(s.x, s.y);
       var angle = Math.atan2(s.vy, s.vx);
       sparkCtx.rotate(angle);
 
-      // Glowing streak
-      sparkCtx.shadowColor = s.color;
-      sparkCtx.shadowBlur = 8;
+      // Deep blood red glowing streak
+      sparkCtx.shadowColor = '#e11d48';
+      sparkCtx.shadowBlur = 5;
 
       var grad = sparkCtx.createLinearGradient(-len, 0, 0, 0);
       grad.addColorStop(0, 'transparent');
-      grad.addColorStop(0.7, s.color);
-      grad.addColorStop(1, '#ffffff');
+      grad.addColorStop(0.5, s.color);
+      grad.addColorStop(1, '#ff3344');
 
       sparkCtx.strokeStyle = grad;
-      sparkCtx.lineWidth = s.size * (1 - progress * 0.5);
+      sparkCtx.lineWidth = s.size * (1 - progress * 0.6);
       sparkCtx.lineCap = 'round';
 
       sparkCtx.beginPath();
@@ -176,21 +175,23 @@
 
   function spawnSparksBurst(x, y) {
     ensureSparkCanvas();
-    var count = 18;
-    var colors = ['#ffffff', '#ff4d6d', '#ff1744', '#dc2626', '#b91c1c', '#fda4af'];
+    var count = 10;
+    // Rich blood red & crimson Elden Ring tones
+    var colors = ['#dc2626', '#b91c1c', '#991b1b', '#e11d48', '#ff1744', '#7f1d1d'];
 
     for (var i = 0; i < count; i++) {
-      var angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4 - 0.2);
-      var speed = 2.5 + Math.random() * 4.8;
+      var angle = (Math.PI * 2 * i) / count + (Math.random() * 0.5 - 0.25);
+      // Compact, small speed burst (~1.2 - 2.8px/frame)
+      var speed = 1.2 + Math.random() * 1.6;
       activeSparks.push({
         x: x,
         y: y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        size: 1.5 + Math.random() * 1.5,
+        size: 1.1 + Math.random() * 0.9,
         color: colors[Math.floor(Math.random() * colors.length)],
         life: 0,
-        maxLife: 26 + Math.floor(Math.random() * 14)
+        maxLife: 16 + Math.floor(Math.random() * 8)
       });
     }
 
