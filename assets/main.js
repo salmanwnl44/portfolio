@@ -77,22 +77,35 @@
       }
       var now = audioCtx.currentTime;
 
-      // Clean, rich mechanical click with soft low-end body (like a premium mouse/switch tap)
-      var osc = audioCtx.createOscillator();
-      var gain = audioCtx.createGain();
+      // 1. Crisp high attack snap (flint click)
+      var snapOsc = audioCtx.createOscillator();
+      var snapGain = audioCtx.createGain();
+      snapOsc.type = 'triangle';
+      snapOsc.frequency.setValueAtTime(1400, now);
+      snapOsc.frequency.exponentialRampToValueAtTime(380, now + 0.03);
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(420, now);
-      osc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
+      snapGain.gain.setValueAtTime(0.22, now);
+      snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
 
-      gain.gain.setValueAtTime(0.09, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+      snapOsc.connect(snapGain);
+      snapGain.connect(audioCtx.destination);
+      snapOsc.start(now);
+      snapOsc.stop(now + 0.035);
 
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      // 2. Punchy body thud (satisfying tactile pop)
+      var thudOsc = audioCtx.createOscillator();
+      var thudGain = audioCtx.createGain();
+      thudOsc.type = 'sine';
+      thudOsc.frequency.setValueAtTime(320, now);
+      thudOsc.frequency.exponentialRampToValueAtTime(75, now + 0.055);
 
-      osc.start(now);
-      osc.stop(now + 0.04);
+      thudGain.gain.setValueAtTime(0.28, now);
+      thudGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+
+      thudOsc.connect(thudGain);
+      thudGain.connect(audioCtx.destination);
+      thudOsc.start(now);
+      thudOsc.stop(now + 0.055);
     } catch (e) {
       /* Audio context blocked or not supported */
     }
