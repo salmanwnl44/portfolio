@@ -725,7 +725,41 @@ button {
   justify-content: center;
 }
 
-/* ---------- skills marquee ---------- */
+/* ---------- toast notification ---------- */
+.toast-msg {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  font-size: 0.86rem;
+  font-family: var(--font-mono);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.toast-msg.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
 .marquee {
   position: relative;
   overflow: hidden;

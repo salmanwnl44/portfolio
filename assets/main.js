@@ -111,7 +111,23 @@
       });
     });
 
-    /* ---------------- copy to clipboard ---------------- */
+    /* ---------------- copy to clipboard & toast ---------------- */
+    function showToast(text) {
+      var toast = document.querySelector('.toast-msg');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.innerHTML = '<span class="toast-dot"></span><span class="toast-text"></span>';
+        document.body.appendChild(toast);
+      }
+      toast.querySelector('.toast-text').textContent = text;
+      toast.classList.add('is-visible');
+      window.clearTimeout(toast._timer);
+      toast._timer = window.setTimeout(function () {
+        toast.classList.remove('is-visible');
+      }, 3000);
+    }
+
     document.querySelectorAll('[data-copy]').forEach(function (btn) {
       if (btn.dataset.copyInited) return;
       btn.dataset.copyInited = 'true';
@@ -128,12 +144,30 @@
             btn.classList.add('is-copied');
             window.setTimeout(function () { btn.classList.remove('is-copied'); }, 1400);
           }
+          showToast(ok ? 'Email copied: ' + value : 'Could not copy to clipboard');
         };
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(value).then(function () { done(true); }, function () { done(false); });
         } else {
           done(false);
         }
+      });
+    });
+
+    // Handle mailto clicks robustly across OS/browsers
+    document.querySelectorAll('a[href^="mailto:"]').forEach(function (mailLink) {
+      if (mailLink.dataset.mailtoInited) return;
+      mailLink.dataset.mailtoInited = 'true';
+      mailLink.addEventListener('click', function (e) {
+        var email = (mailLink.getAttribute('href') || '').replace(/^mailto:/i, '');
+        // Also copy email to clipboard as backup in case no desktop client is configured
+        if (navigator.clipboard && navigator.clipboard.writeText && email) {
+          navigator.clipboard.writeText(email).then(function () {
+            showToast('Opening mail client (Email copied: ' + email + ')');
+          }).catch(function () {});
+        }
+        // Force window location directly to trigger mailto protocol
+        window.location.href = mailLink.getAttribute('href');
       });
     });
 
