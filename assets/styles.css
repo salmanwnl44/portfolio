@@ -725,7 +725,7 @@ button {
   justify-content: center;
 }
 
-/* ---------- blood-red flame click effect ---------- */
+/* ---------- Rivers of Blood (Corpse Piler) blood slash effect ---------- */
 .click-flame-burst {
   position: fixed;
   width: 0;
@@ -734,50 +734,89 @@ button {
   z-index: 99999;
 }
 
-.click-flame-core {
+/* Arc slash blade streak */
+.blood-slash-blade {
   position: absolute;
-  width: 22px;
-  height: 28px;
-  left: -11px;
-  bottom: -6px;
-  background: radial-gradient(ellipse at 50% 80%, #ffffff 0%, #ff4d4d 35%, #b91c1c 70%, transparent 100%);
-  border-radius: 50% 50% 40% 40% / 70% 70% 30% 30%;
-  filter: drop-shadow(0 0 8px #dc2626) drop-shadow(0 -2px 14px #7f0909);
-  animation: flameIgnite 0.42s ease-out forwards;
+  width: 58px;
+  height: 18px;
+  left: -29px;
+  top: -9px;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  border-top: 3.5px solid #ff3344;
+  border-right: 2px solid #b91c1c;
+  background: radial-gradient(ellipse at 50% 0%, rgba(220, 20, 60, 0.45) 0%, rgba(136, 0, 21, 0.2) 60%, transparent 100%);
+  filter: drop-shadow(0 -1px 8px #e11d48) drop-shadow(0 0 16px #880015);
+  transform-origin: center center;
+  animation: riversOfBloodSlash 0.36s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
 }
 
-@keyframes flameIgnite {
+@keyframes riversOfBloodSlash {
   0% {
-    transform: scale(0.2) translateY(6px);
+    transform: rotate(var(--slash-angle, -35deg)) scaleX(0.2) scaleY(0.4);
     opacity: 0.95;
+    filter: drop-shadow(0 0 12px #ff2244) drop-shadow(0 0 24px #880015);
   }
-  40% {
-    transform: scale(1.15) translateY(-6px) scaleX(0.85);
+  45% {
+    transform: rotate(var(--slash-angle, -35deg)) scaleX(1.3) scaleY(1.1);
     opacity: 1;
+    filter: drop-shadow(0 0 16px #ff3344) drop-shadow(0 0 30px #4a000b);
   }
   100% {
-    transform: scale(0.4) translateY(-22px) scaleX(0.6);
+    transform: rotate(var(--slash-angle, -35deg)) scaleX(1.6) scaleY(0.2) translateY(-8px);
+    opacity: 0;
+    filter: drop-shadow(0 0 4px #880015);
+  }
+}
+
+/* Sanguine blood-flame core */
+.blood-slash-core {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: -7px;
+  top: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff0f3 0%, #ff1744 40%, #880015 80%, transparent 100%);
+  box-shadow: 0 0 12px #e11d48, 0 0 24px #880015;
+  animation: bloodCoreBurst 0.32s ease-out forwards;
+}
+
+@keyframes bloodCoreBurst {
+  0% {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
     opacity: 0;
   }
 }
 
-.click-flame-spark {
+/* Sanguine spatter droplets */
+.blood-slash-spatter {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3.5px;
+  height: 3.5px;
   border-radius: 50%;
-  background: #fca5a5;
-  box-shadow: 0 0 6px #dc2626;
-  animation: sparkFly 0.38s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
+  background: #ff4d6d;
+  box-shadow: 0 0 6px #e11d48, 0 0 12px #59000c;
+  animation: bloodSpatterSpray 0.38s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
 }
 
-@keyframes sparkFly {
+@keyframes bloodSpatterSpray {
   0% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) scale(1.2);
     opacity: 1;
   }
+  70% {
+    opacity: 0.85;
+  }
   100% {
-    transform: translate(var(--dx), var(--dy)) scale(0);
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
     opacity: 0;
   }
 }

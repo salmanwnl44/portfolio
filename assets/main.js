@@ -39,9 +39,11 @@
     window.setInterval(tick, 1000);
   }
 
-  /* ---------------- blood-red flame click effect & sound ---------------- */
+  /* ---------------- Rivers of Blood / Corpse Piler click slash & sound ---------------- */
   var audioCtx = null;
-  function playFlameIgniteSound() {
+  var slashToggle = false;
+
+  function playCorpsePilerSlashSound() {
     try {
       if (!audioCtx) {
         var AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -53,72 +55,81 @@
       }
       var now = audioCtx.currentTime;
 
-      // 1. Crisp initial igniter snap
-      var snapOsc = audioCtx.createOscillator();
-      var snapGain = audioCtx.createGain();
-      snapOsc.type = 'triangle';
-      snapOsc.frequency.setValueAtTime(650, now);
-      snapOsc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
-      snapGain.gain.setValueAtTime(0.06, now);
-      snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
-      snapOsc.connect(snapGain);
-      snapGain.connect(audioCtx.destination);
-      snapOsc.start(now);
-      snapOsc.stop(now + 0.04);
+      // 1. Sharp high-frequency steel slash whip
+      var bladeOsc = audioCtx.createOscillator();
+      var bladeGain = audioCtx.createGain();
+      bladeOsc.type = 'sawtooth';
+      bladeOsc.frequency.setValueAtTime(1400, now);
+      bladeOsc.frequency.exponentialRampToValueAtTime(320, now + 0.06);
 
-      // 2. Warm flame whoosh / ember flare
-      var bufferSize = audioCtx.sampleRate * 0.08;
+      bladeGain.gain.setValueAtTime(0.05, now);
+      bladeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+      bladeOsc.connect(bladeGain);
+      bladeGain.connect(audioCtx.destination);
+      bladeOsc.start(now);
+      bladeOsc.stop(now + 0.06);
+
+      // 2. Heavy blood-flame burst whoosh
+      var bufferSize = audioCtx.sampleRate * 0.12;
       var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       var data = buffer.getChannelData(0);
       for (var i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.35));
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.28));
       }
       var noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
 
       var filter = audioCtx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(450, now);
-      filter.frequency.exponentialRampToValueAtTime(220, now + 0.07);
-      filter.Q.setValueAtTime(2.5, now);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(900, now);
+      filter.frequency.exponentialRampToValueAtTime(180, now + 0.11);
 
       var noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.05, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+      noiseGain.gain.setValueAtTime(0.07, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
 
       noise.connect(filter);
       filter.connect(noiseGain);
       noiseGain.connect(audioCtx.destination);
       noise.start(now);
-      noise.stop(now + 0.08);
+      noise.stop(now + 0.12);
     } catch (e) {
       /* Audio context blocked or not supported */
     }
   }
 
-  function spawnFlameEffect(x, y) {
+  function spawnCorpsePilerSlash(x, y) {
     var burst = document.createElement('div');
     burst.className = 'click-flame-burst';
     burst.style.left = x + 'px';
     burst.style.top = y + 'px';
 
+    // Alternate diagonal katana swing angle (-38deg and 35deg like Corpse Piler combo)
+    slashToggle = !slashToggle;
+    var angle = slashToggle ? -38 : 34;
+
+    var blade = document.createElement('div');
+    blade.className = 'blood-slash-blade';
+    blade.style.setProperty('--slash-angle', angle + 'deg');
+    burst.appendChild(blade);
+
     var core = document.createElement('div');
-    core.className = 'click-flame-core';
+    core.className = 'blood-slash-core';
     burst.appendChild(core);
 
-    // 4 tiny blood embers flying up
-    var angles = [-25, -10, 10, 25];
-    angles.forEach(function (angle) {
-      var spark = document.createElement('div');
-      spark.className = 'click-flame-spark';
-      var dist = 14 + Math.random() * 16;
-      var rad = (angle - 90) * (Math.PI / 180);
-      var dx = Math.cos(rad) * dist;
-      var dy = Math.sin(rad) * dist;
-      spark.style.setProperty('--dx', dx.toFixed(1) + 'px');
-      spark.style.setProperty('--dy', dy.toFixed(1) + 'px');
-      burst.appendChild(spark);
-    });
+    // Dynamic blood spray droplets along the swing trajectory
+    for (var i = 0; i < 5; i++) {
+      var spatter = document.createElement('div');
+      spatter.className = 'blood-slash-spatter';
+      var spread = (angle + (Math.random() * 50 - 25)) * (Math.PI / 180);
+      var dist = 16 + Math.random() * 26;
+      var dx = Math.cos(spread) * dist;
+      var dy = Math.sin(spread) * dist;
+      spatter.style.setProperty('--dx', dx.toFixed(1) + 'px');
+      spatter.style.setProperty('--dy', dy.toFixed(1) + 'px');
+      burst.appendChild(spatter);
+    }
 
     document.body.appendChild(burst);
     window.setTimeout(function () {
@@ -128,8 +139,8 @@
 
   window.addEventListener('pointerdown', function (e) {
     if (e.button !== 0) return; // primary click only
-    spawnFlameEffect(e.clientX, e.clientY);
-    playFlameIgniteSound();
+    spawnCorpsePilerSlash(e.clientX, e.clientY);
+    playCorpsePilerSlashSound();
   }, { passive: true });
 
   /* ---------------- page interactive components ---------------- */
