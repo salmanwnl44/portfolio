@@ -77,35 +77,59 @@
       }
       var now = audioCtx.currentTime;
 
-      // 1. Crisp high attack snap (flint click)
-      var snapOsc = audioCtx.createOscillator();
-      var snapGain = audioCtx.createGain();
-      snapOsc.type = 'triangle';
-      snapOsc.frequency.setValueAtTime(1400, now);
-      snapOsc.frequency.exponentialRampToValueAtTime(380, now + 0.03);
+      // 1. Sharp Katana Steel Clash transient
+      var clashOsc = audioCtx.createOscillator();
+      var clashGain = audioCtx.createGain();
+      clashOsc.type = 'sawtooth';
+      clashOsc.frequency.setValueAtTime(3200, now);
+      clashOsc.frequency.exponentialRampToValueAtTime(1100, now + 0.04);
 
-      snapGain.gain.setValueAtTime(0.22, now);
-      snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+      clashGain.gain.setValueAtTime(0.24, now);
+      clashGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
-      snapOsc.connect(snapGain);
-      snapGain.connect(audioCtx.destination);
-      snapOsc.start(now);
-      snapOsc.stop(now + 0.035);
+      clashOsc.connect(clashGain);
+      clashGain.connect(audioCtx.destination);
+      clashOsc.start(now);
+      clashOsc.stop(now + 0.045);
 
-      // 2. Punchy body thud (satisfying tactile pop)
-      var thudOsc = audioCtx.createOscillator();
-      var thudGain = audioCtx.createGain();
-      thudOsc.type = 'sine';
-      thudOsc.frequency.setValueAtTime(320, now);
-      thudOsc.frequency.exponentialRampToValueAtTime(75, now + 0.055);
+      // 2. High-pitched harmonic blade resonance ring (metallic ping ring-out)
+      var ringOsc = audioCtx.createOscillator();
+      var ringGain = audioCtx.createGain();
+      ringOsc.type = 'sine';
+      ringOsc.frequency.setValueAtTime(2450, now);
+      ringOsc.frequency.exponentialRampToValueAtTime(2420, now + 0.12);
 
-      thudGain.gain.setValueAtTime(0.28, now);
-      thudGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+      ringGain.gain.setValueAtTime(0.20, now);
+      ringGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
 
-      thudOsc.connect(thudGain);
-      thudGain.connect(audioCtx.destination);
-      thudOsc.start(now);
-      thudOsc.stop(now + 0.055);
+      ringOsc.connect(ringGain);
+      ringGain.connect(audioCtx.destination);
+      ringOsc.start(now);
+      ringOsc.stop(now + 0.12);
+
+      // 3. Fast metallic slice texture
+      var bufferSize = Math.floor(audioCtx.sampleRate * 0.06);
+      var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
+      }
+      var noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+
+      var filter = audioCtx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(3500, now);
+
+      var noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.12, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+      noise.start(now);
+      noise.stop(now + 0.06);
     } catch (e) {
       /* Audio context blocked or not supported */
     }
