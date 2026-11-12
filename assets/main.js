@@ -39,6 +39,57 @@
     window.setInterval(tick, 1000);
   }
 
+  /* ---------------- subtle click sound & ripple ---------------- */
+  var audioCtx = null;
+  function playClickSound() {
+    try {
+      if (!audioCtx) {
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      var now = audioCtx.currentTime;
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+
+      // Mechanical clean subtle UI tap
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(320, now + 0.035);
+
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.035);
+    } catch (e) {
+      /* Audio context blocked or not supported */
+    }
+  }
+
+  function spawnRipple(x, y) {
+    var ripple = document.createElement('div');
+    ripple.className = 'click-ripple';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    document.body.appendChild(ripple);
+    window.setTimeout(function () {
+      if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+    }, 450);
+  }
+
+  window.addEventListener('pointerdown', function (e) {
+    if (e.button !== 0) return; // primary click only
+    spawnRipple(e.clientX, e.clientY);
+    playClickSound();
+  }, { passive: true });
+
   /* ---------------- page interactive components ---------------- */
   function initPageComponents() {
     /* ---------------- marquee: clone track for a seamless loop ---------------- */

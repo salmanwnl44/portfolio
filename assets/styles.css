@@ -725,6 +725,40 @@ button {
   justify-content: center;
 }
 
+/* ---------- click ripple effect ---------- */
+.click-ripple {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  margin-left: -12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+  z-index: 99999;
+  transform: scale(0.2);
+  opacity: 1;
+  animation: clickRippleAnim 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes clickRippleAnim {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.btn:active,
+button:active,
+a:active {
+  transform: scale(0.97) translateY(0) !important;
+}
+
 /* ---------- toast notification ---------- */
 .toast-msg {
   position: fixed;
