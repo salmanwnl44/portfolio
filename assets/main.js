@@ -133,17 +133,16 @@
       }
 
       if (s.isFlameCore) {
-        // Central flame tongue: flickers and rises slightly upward
-        s.y += s.vy;
-        var flameScale = 1 - progress * 0.4;
+        // Central flame puff: stays centered, gently expands and dissolves
+        var flameScale = 1 + progress * 0.25;
         var alpha = 1 - progress;
 
         sparkCtx.save();
         sparkCtx.translate(s.x, s.y);
         sparkCtx.shadowColor = '#e11d48';
-        sparkCtx.shadowBlur = 12;
+        sparkCtx.shadowBlur = 10;
 
-        var coreGrad = sparkCtx.createRadialGradient(0, 2, 0, 0, 0, s.radius * flameScale);
+        var coreGrad = sparkCtx.createRadialGradient(0, 0, 0, 0, 0, s.radius * flameScale);
         coreGrad.addColorStop(0, 'rgba(255, 230, 230, ' + alpha * 0.95 + ')');
         coreGrad.addColorStop(0.35, 'rgba(255, 30, 68, ' + alpha * 0.85 + ')');
         coreGrad.addColorStop(0.7, 'rgba(185, 28, 28, ' + alpha * 0.6 + ')');
@@ -151,16 +150,15 @@
 
         sparkCtx.fillStyle = coreGrad;
         sparkCtx.beginPath();
-        // Teardrop flame shape
-        sparkCtx.ellipse(0, 0, s.radius * 0.75 * flameScale, s.radius * flameScale, 0, 0, Math.PI * 2);
+        sparkCtx.arc(0, 0, s.radius * flameScale, 0, Math.PI * 2);
         sparkCtx.fill();
         sparkCtx.restore();
       } else {
-        // Bold spark streak: velocity + drag + subtle upward heat drift
+        // Bold radial spark streak: shoots outward uniformly in all 360 directions
         s.x += s.vx;
         s.y += s.vy;
-        s.vx *= 0.90;
-        s.vy = s.vy * 0.90 - 0.08; // slight upward flame convection
+        s.vx *= 0.91;
+        s.vy *= 0.91; // pure deceleration, zero gravity/upward pull
 
         var len = Math.max(3.5, Math.sqrt(s.vx * s.vx + s.vy * s.vy) * 2.5);
 
@@ -203,31 +201,29 @@
   function spawnSparksBurst(x, y) {
     ensureSparkCanvas();
 
-    // 1. Central miniature blood-flame core puff
+    // 1. Central miniature blood-flame core puff (stays centered)
     activeSparks.push({
       x: x,
       y: y,
-      vy: -0.6, // gentle upward rise
-      radius: 9,
+      radius: 8,
       isFlameCore: true,
       life: 0,
-      maxLife: 15
+      maxLife: 14
     });
 
-    // 2. Bold blood sparks surrounding the flame
+    // 2. Bold blood sparks exploding evenly in a 360-degree circle
     var count = 10;
     var colors = ['#dc2626', '#b91c1c', '#e11d48', '#ff1744', '#991b1b'];
 
     for (var i = 0; i < count; i++) {
-      var angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4 - 0.2);
-      // Compact size maintained (~1.3 - 2.6px)
-      var speed = 1.3 + Math.random() * 1.5;
+      var angle = (Math.PI * 2 * i) / count + (Math.random() * 0.25 - 0.12);
+      var speed = 1.4 + Math.random() * 1.5;
       activeSparks.push({
         x: x,
         y: y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        size: 2.6 + Math.random() * 1.2, // Bolder width
+        size: 2.6 + Math.random() * 1.2,
         color: colors[Math.floor(Math.random() * colors.length)],
         isFlameCore: false,
         life: 0,
