@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Designing Yavin Architect: The Verification Harness That Keeps AI Agents From Drifting — Salman Ansari</title>
+<meta name="description" content="A deep dive into Yavin Architect: an append-only cryptographic ledger, single-writer Arbiter, Temporal design sessions, pure checks engine, and a dual-backend knowledge plane built to keep AI agents grounded." />
+<meta name="author" content="Salman Ansari" />
+<meta name="theme-color" content="#0b0d0e" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Designing Yavin Architect: The Verification Harness That Keeps AI Agents From Drifting" />
+<meta property="og:description" content="Single-writer Arbiter, append-only ledger, deterministic Temporal workflows, pure checks, and a claim-first knowledge graph built alongside Yavin." />
+<meta property="article:published_time" content="2026-11-16T12:00:00Z" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0d0e'/><text x='50' y='68' font-family='monospace' font-size='56' font-weight='700' fill='%23ffffff' text-anchor='middle'>S</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./assets/styles.css?v=202611122040" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Designing Yavin Architect: The Verification Harness That Keeps AI Agents From Drifting",
+  "datePublished": "2026-11-16T12:00:00Z",
+  "author": { "@type": "Person", "name": "Salman Ansari", "url": "https://github.com/salmanwnl44" }
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="navbar" aria-label="Primary">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="./" class="nav-link">Home</a></li>
+      <li><a href="./projects" class="nav-link">Projects</a></li>
+      <li><a href="./blog" class="nav-link is-active">Blog</a></li>
+      <li><a href="./resume" class="nav-link">Resume</a></li>
+      <li><a href="./analytics" class="nav-link">Analytics</a></li>
+      <li><a href="./support" class="nav-link">Support</a></li>
+    </ul>
+    <a class="nav-star" href="https://github.com/salmanwnl44" target="_blank" rel="noopener">
+      <svg class="star" viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z"/></svg>
+      <span>Open-source</span>
+    </a>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <article class="article">
+    <header class="article-head">
+      <a class="back-link" href="./blog">← all posts</a>
+      <div class="post-meta" style="margin-bottom:10px"><span>Deep dive</span><span class="sep">·</span><span>Architecture Spec</span></div>
+      <h1 class="article-title">Designing Yavin Architect: The Verification Harness That Keeps AI Agents From Drifting</h1>
+      <p class="article-desc">Autonomous code agents don't fail by throwing exceptions. They fail silently: subtly altering system models, inventing facts, hallucinating API signatures, and forgetting constraints. Here is how we engineered Yavin Architect — a rigorous, append-only, contract-driven verification platform that governs every proposal with mathematical determinism.</p>
+      <div class="author">
+        <img src="./assets/portrait.jpg" alt="Salman Ansari" width="36" height="36" />
+        <div>
+          <div class="author-name">Salman Ansari</div>
+          <div class="author-meta"><time datetime="2026-11-16">16 November 2026</time> · 14 min read</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ARCHITECTURE FLOW VISUAL -->
+    <div class="quote-card" style="padding: 24px; border-color: rgba(225, 29, 72, 0.4); background: rgba(225, 29, 72, 0.02); margin-bottom: 30px;">
+      <div class="quote-head">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>YAVIN ARCHITECT // END-TO-END VERIFICATION PIPELINE</span>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.6; color: var(--text-secondary); overflow-x: auto; padding: 12px 0;">
+        <pre style="margin: 0; color: #f43f5e;">
+[ Agents / External Ingestion ]
+           │  (Proposes Candidates: Claims, Model Patches, Checks)
+           ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│  BOUNDARY VALIDATION: phase0-contracts (JSON Schema Draft 2020-12)     │
+└──────────────────────────────────┬─────────────────────────────────────┘
+                                   │
+                                   ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│  THE ARBITER (Single Writer // Advisory Lock // Deterministic Rules)   │
+│  - Refuses: Schema violation, base moved, cyclic graphs, bad units     │
+│  - Stamps:  Dense sequence (seq=0,1,2..), Canonical SHA-256 prev_hash  │
+└──────────────────────────────────┬─────────────────────────────────────┘
+                                   │
+                                   ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│  THE LEDGER (PostgreSQL `events` table // Trigger-Enforced Append-Only)│
+│  * UPDATE / DELETE / TRUNCATE triggers raise SQLSTATE errors.          │
+└──────────────┬──────────────────────────────────────────┬──────────────┘
+               │                                          │
+               ▼                                          ▼
+┌──────────────────────────────┐          ┌──────────────────────────────┐
+│  ARBITER STATE (`arb_*`)     │          │  READ-MODEL PROJECTIONS      │
+│  Synchronous in-transaction  │          │  Async Projector (`proj_*`)  │
+│  epistemic state for Arbiter │          │  Deterministic fold for API  │
+└──────────────────────────────┘          └──────────────┬───────────────┘
+                                                         │
+               ┌─────────────────────────────────────────┴───────────────┐
+               ▼                                                         ▼
+┌──────────────────────────────┐          ┌──────────────────────────────┐
+│  PURE CHECKS ENGINE (M3)     │          │  CLAIM-FIRST KNOWLEDGE (M8)  │
+│  Zero DB / Zero Network      │          │  Dual Store: AGE & SQL Graph │
+│  check(model, ctx) -> Verdict│          │  Dual Vector: pgvector/Exact │
+└──────────────┬───────────────┘          └──────────────┬───────────────┘
+               │                                         │
+               └────────────────────┬────────────────────┘
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│  TEMPORAL DESIGN SESSIONS (M6) // Durable Multi-Phase State Machine    │
+│  Problem Formulation → Exploration → Convergence → Human Gate Sign-off │
+└────────────────────────────────────────────────────────────────────────┘
+        </pre>
+      </div>
+    </div>
+
+    <p>When software developers talk about autonomous coding agents, the discussion almost always focuses on generation: how fast a model can spit out 200 lines of Python or how clever it is at prompting. But when we started building <strong>Yavin</strong>, our AI-native code editor, we quickly ran into the harsh reality of real-world software engineering:</p>
+
+    <div class="alert alert-warn">
+      <span class="ico" aria-hidden="true">!</span>
+      <div><strong>The Primary Failure Mode:</strong> An agent doesn't crash your build. Instead, it subtly edits an architectural boundary, swaps an API parameter, invents an undeclared dependency, and commits a patch that works in isolation while quietly eroding your system architecture.</div>
+    </div>
+
+    <p>We realized that to make autonomous code agents viable for mission-critical software, we didn't just need better models. We needed an unyielding, mathematically verifiable referee. We called it <strong>Yavin Architect</strong>.</p>
+
+    <p>This post unpacks the technical architecture of Yavin Architect: the frozen Phase 0 contract system, the single-writer Arbiter pattern, the cryptographic hash-chained append-only ledger, the deterministic checks engine, and how we orchestrated long-running design sessions using Temporal.</p>
+
+    <hr class="hero-rule" />
+
+    <h2>1. The Core Invariant: "The Ledger Is Truth"</h2>
+    <p>Most AI backend architectures store state in conventional mutable tables: an <code>agents</code> table, a <code>tasks</code> table, and a <code>models</code> table where rows are updated in place as an agent iterates. This is fatal for AI governance because it destroys provenance. When an agent hallucinates or makes a catastrophic mistake, you cannot prove what state it observed or what caused the drift.</p>
+
+    <p>In Yavin Architect, we instituted an iron law codified directly in <span class="mark">CLAUDE.md</span>:</p>
+
+    <div class="code">
+      <div class="code-head">
+        <span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>PostgreSQL Append-Only Trigger — schema.sql</span>
+      </div>
+      <pre><code>CREATE OR REPLACE FUNCTION trg_events_immutable()
+RETURNS TRIGGER AS $$
+BEGIN
+  RAISE EXCEPTION 'events table is strictly append-only; % is forbidden', TG_OP
+    USING ERRCODE = '23505';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER events_no_update_or_delete
+BEFORE UPDATE OR DELETE OR TRUNCATE ON events
+FOR EACH STATEMENT EXECUTE FUNCTION trg_events_immutable();</code></pre>
+    </div>
+
+    <p>No code path can ever update, delete, or truncate an event. If a query attempts it, PostgreSQL immediately raises an exception. Every event committed to the ledger is stamped with:</p>
+    <ul class="list">
+      <li>A <strong>dense sequence number (<code>seq</code>)</strong> starting at 0 with no gaps.</li>
+      <li>A <strong>cryptographic <code>prev_hash</code></strong>: the canonical SHA-256 hash of the preceding event's wire bytes (sorted keys, compact separators, UTF-8).</li>
+      <li>A verbatim wire timestamp string (<code>ts_wire</code>) stored beside PostgreSQL's native <code>timestamptz</code>, guaranteeing that dumping and replaying the ledger produces identical byte-for-byte hashes across systems.</li>
+    </ul>
+
+    <hr class="hero-rule" />
+
+    <h2>2. The Arbiter: The Solitary Gatekeeper</h2>
+    <p>If anyone could write to the ledger, chaos would follow. In Yavin Architect, <strong>only one module in the entire codebase is permitted to write to the ledger: the Arbiter</strong> (<code>src/architect/arbiter.py</code>). We enforce this with an automated architectural test (<code>tests/test_architecture.py</code>) that inspects every module's AST and fails CI if any file other than the Arbiter executes an INSERT on the <code>events</code> table.</p>
+
+    <div class="pillar">
+      <h3><span class="num">01</span> Per-Project Advisory Locks</h3>
+      <p>Concurrent agent runs or API requests cannot race. The Arbiter serializes commits per project using PostgreSQL advisory transactions: <span class="mark">pg_advisory_xact_lock(hashtextextended(project_id, 0))</span>. Parallel commits to separate projects run at full wire speed; commits to the same project wait in an orderly line.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">02</span> Zero-Tolerance Boundary Validation</h3>
+      <p>Before an event is touched, it is deep-validated against <strong>Phase 0 frozen JSON schemas</strong> (Draft 2020-12). If an embedded claim, patch op, or check result fails schema validation or omits required fields, the Arbiter returns a structured, typed <code>422 SCHEMA_INVALID</code> with the exact JSON pointer, writing nothing.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">03</span> Mathematical State Projection</h3>
+      <p>The internal tables the Arbiter uses to evaluate rules (<code>arb_claims</code>, <code>arb_model_versions</code>, <code>arb_proposals</code>) are strictly projections. If you drop all <code>arb_*</code> tables, running <span class="mark">architect rebuild-state</span> completely reconstructs them by folding the ledger from sequence 0. Dropping cached state never loses information.</p>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="num">04</span> Typed Rejection Codes</h3>
+      <p>Nothing in the Arbiter fails with a generic error message. Every refusal is mapped to a strict typed rejection code: <span class="mark">BASE_MOVED</span> (optimistic concurrency lock violated), <span class="mark">PATCH_TARGET_MISSING</span>, <span class="mark">DUPLICATE_PROPOSAL</span>, or <span class="mark">WAIVER_NOT_HUMAN</span>. Every code is backed by an automated refusal test.</p>
+    </div>
+
+    <hr class="hero-rule" />
+
+    <h2>3. The Architecture Engine: How the Pieces Connect</h2>
+    <p>Building a verifiable platform requires clean decoupling. Yavin Architect separates ingestion, gate validation, execution, and semantic memory into distinct layers:</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="color: #f43f5e; margin-bottom: 8px;">The Model Fold</h3>
+        <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);">
+          System models are never written as massive monolithic JSON blobs on every edit. Instead, versions evolve through atomic patch operations (<code>add_element</code>, <code>update_element</code>, <code>remove_element</code>). The Model Fold (<code>model_fold.py</code>) deterministically applies patches to produce a frozen snapshot.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #f43f5e; margin-bottom: 8px;">Pure Checks Engine</h3>
+        <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);">
+          Checks enforce architectural invariants (e.g. no cyclic dependencies, units compatibility, interface contract compliance). Crucially, checks are <em>pure functions</em>: <code>check(model, ctx, params) -> CheckOutcome</code>. They have zero DB access, zero network calls, and zero randomness.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #f43f5e; margin-bottom: 8px;">The Model Gateway</h3>
+        <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);">
+          Every LLM interaction routes through <code>architect.gateway</code>. It enforces write-ahead reservation logs (<code>gw_calls</code>) before invoking a provider. If a worker crashes mid-flight, spend is never under-counted. Provider keys are read from env vars and never logged.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="color: #f43f5e; margin-bottom: 8px;">Claim-First Knowledge Plane</h3>
+        <p style="font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);">
+          Knowledge isn't raw chunks of text. It is extracted as structured epistemic claims with provenance, verbatim quotes, conditions, and confidence. Features a dual-backend: Apache AGE graph + pgvector, with a 100% parity pure SQL fallback.
+        </p>
+      </div>
+    </div>
+
+    <hr class="hero-rule" />
+
+    <h2>4. Temporal Design Sessions: Surviving the Real World</h2>
+    <p>A typical software architecture task cannot be solved in a single prompt-response loop. An agent must explore documentation, formulate trade-offs, draft proposals, run verification checks, and wait for human review. If your server restarts 45 minutes into an agent's work, what happens?</p>
+
+    <p>In standard architectures, everything is lost. In Yavin Architect, design sessions are built on <strong>Temporal workflows</strong> (<code>src/architect/sessions/workflow.py</code>):</p>
+
+    <div class="code">
+      <div class="code-head">
+        <span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>Session State Machine Flow</span>
+      </div>
+      <pre><code>PHASE 1: PROBLEM FORMULATION
+   │  → Agent audits requirements & linting rules
+   ▼
+PHASE 2: CONTEXT COMPILATION
+   │  → Knowledge retrieval pulls relevant claims & boundary models
+   ▼
+PHASE 3: EXPLORATION & CANDIDATE SYNTHESIS
+   │  → Agent synthesizes model patches & claims
+   ▼
+PHASE 4: VERIFICATION & CHECKS RUNNER
+   │  → Pure checks evaluate structural integrity & cyclic rules
+   ▼
+PHASE 5: HUMAN GATE DECISION
+   │  → APPROVE  │  APPROVE_WITH_RISKS (Signs Waiver)  │  REJECT
+   ▼
+PHASE 6: ARBITER COMMIT & CONVERGENCE</code></pre>
+    </div>
+
+    <p>Because Temporal workflows are fully deterministic, every side effect runs inside an <strong>idempotent Activity</strong>. Activity IDs, claim IDs, and proposal IDs are mathematically derived from <code>(session_id, phase, round, step)</code>, never from <code>uuid4()</code> or system time. If an activity worker dies during an LLM invocation, Temporal heartbeats detect the failure and cleanly retry without generating duplicate ledger entries or orphan reservations.</p>
+
+    <hr class="hero-rule" />
+
+    <h2>5. Lessons From Shipping a Rigorous Harness</h2>
+    <p>Building Yavin Architect taught us several foundational truths about building software with AI agents:</p>
+
+    <ul class="list">
+      <li><span class="mark-strong">Contracts must be frozen early</span>: Our Phase 0 JSON schemas were frozen at v1.0 and then v1.2. When a contract caused friction during implementation, our engineers were not allowed to edit the schema — they documented the issue in <code>contracts-PROPOSALS.md</code> and worked around it. This discipline kept our ground truth inviolable.</li>
+      <li><span class="mark-strong">Models should propose, never decide</span>: In our ingestion and extraction pipeline, LLMs extract candidate claims and cite exact verbatim quotes. The pipeline itself determines taint, calculates provenance, verifies the quote exists in the segment, and computes confidence. Never give an LLM write access to your primary domain tables.</li>
+      <li><span class="mark-strong">Waivers are human-only</span>: When an architectural check fails (e.g. a performance budget or interface invariant), an AI agent is forbidden from signing a waiver. It can only flag the finding as an open risk. Only a human engineer through the gate UI can approve with risks, permanently recording their identity on the ledger.</li>
+    </ul>
+
+    <div class="alert alert-tip">
+      <span class="ico" aria-hidden="true">✓</span>
+      <div><strong>Summary:</strong> By pairing an append-only cryptographic event ledger with a single-writer Arbiter and deterministic checks, Yavin Architect turns AI from an erratic generation tool into a verifiable engineering partner.</div>
+    </div>
+
+    <h2>Tech Stack</h2>
+    <p>Python 3.11+, PostgreSQL 16, Apache AGE (Graph), pgvector, Temporal.io, FastAPI, Pydantic, JSON Schema Draft 2020-12, and Ruff.</p>
+
+    <h2>Resources & References</h2>
+    <ul class="list">
+      <li><a class="link" href="./projects">Yavin Architect Project Entry</a> — The core verification harness repository.</li>
+      <li><a class="link" href="./blog-multi-agent-backend">Building a multi-agent backend from scratch</a> — The runtime guardrails inside Yavin IDE.</li>
+      <li><a class="link" href="https://github.com/salmanwnl44/yavin-architect" target="_blank" rel="noopener">GitHub Repository: salmanwnl44/yavin-architect ↗</a></li>
+    </ul>
+  </article>
+</main>
+
+<footer class="footer">
+  <p class="footer-quote">"Ship it to someone who'll actually use it."</p>
+  <p class="footer-made">Designed &amp; Made with <span class="heart" aria-hidden="true">❤️</span></p>
+  <p class="footer-bottom">
+    <span><span data-year>2026</span>. All rights reserved</span>
+    <span data-clock-24>--:--:-- IST</span>
+  </p>
+</footer>
+
+<script src="./assets/main.js?v=202611122040" defer></script>
+</body>
+</html>
